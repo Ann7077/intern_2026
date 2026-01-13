@@ -1,4 +1,0 @@
-INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/anyu2/0MyFiles/Vivado/project_1/project_1.srcs/sources_1/new/mul_u.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module mul_u
-INFO: [VRFC 10-2263] Analyzing Verilog file "C:/Users/anyu2/0MyFiles/Vivado/project_1/project_1.srcs/sources_1/new/mul_u_tb.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module mul_u_tb
