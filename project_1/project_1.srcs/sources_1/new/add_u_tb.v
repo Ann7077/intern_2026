@@ -56,7 +56,7 @@ module add_u_tb;
         .o_sum(o_sum),
         .o_cout(o_cout)
     );
-    
+        
     task check;
         input [A_W-1:0] a;
         input [B_W-1:0] b;
