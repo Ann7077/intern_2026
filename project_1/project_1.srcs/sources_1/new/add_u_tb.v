@@ -48,6 +48,20 @@ module add_u_tb;
     reg [SUM_W-1:0] exp_sum;  
     reg exp_cout;
     
+    
+    
+    integer fd;
+    initial begin
+        fd = $fopen("add_log.csv", "w");
+        if (fd == 0) begin
+            $display("ERROR: cannot open add_log.csv");
+            $finish;
+        end
+        $fdisplay(fd, "time,a,b,sum_got,sum_exp,cout_got,cout_exp,pass");
+    end
+
+
+    
     add_u dut(
         .i_clk(i_clk),
         .i_rst_n(i_rst_n),
@@ -76,7 +90,9 @@ module add_u_tb;
             
             if ((exp_sum !== o_sum) || (exp_cout !== o_cout)) begin
                 $display("ADD FAIL: a=%0d b=%0d sum_got=%0d sum_exp=%0d cout_got=%0d cout_exp=%0d", a, b, o_sum, exp_sum, o_cout, exp_cout);
-                $stop;
+                $fdisplay(fd, "%0t,%0d,%0d,%0d,%0d,%0d,%0d,0", $time, a, b, o_sum, exp_sum, o_cout, exp_cout);
+            end else begin
+                $fdisplay(fd, "%0t,%0d,%0d,%0d,%0d,%0d,%0d,1", $time, a, b, o_sum, exp_sum, o_cout, exp_cout);
             end
         end
     endtask
@@ -106,6 +122,7 @@ module add_u_tb;
         end
 
         $display("num_tb PASS");    // if all tests passed, print PASS
+        $fclose(fd);
         $finish;                      // end simulation
     end
     

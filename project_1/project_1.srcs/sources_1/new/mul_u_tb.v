@@ -46,6 +46,21 @@ module mul_u_tb;
     
     reg [P_W-1:0] exp_p;  // Declare expected output for reference
     
+    
+    
+    integer fd;
+    initial begin
+        fd = $fopen("mul_log.csv", "w");
+        $display("LOG fd=%0d", fd);
+        if (fd == 0) begin
+          $display("ERROR: cannot open mul_log.csv");
+          $finish;
+        end
+        $fdisplay(fd, "time,a,b,got,exp,pass");  // CSV±íÍ·
+    end
+
+    
+    
     mul_u dut (    // Instantiate the DUT
         .i_clk(i_clk),
         .i_rst_n(i_rst_n),
@@ -68,8 +83,10 @@ module mul_u_tb;
             
             if (o_p !== exp_p) begin
                 $display("MUL FAIL: a=%0d b=%0d got=%0d exp=%0d", a, b, o_p, exp_p);
+                $fdisplay(fd, "%0t,%0d,%0d,%0d,%0d,0", $time, a, b, o_p, exp_p);
                     // display the error message and values found 
-                $stop;
+            end else begin
+                $fdisplay(fd, "%0t,%0d,%0d,%0d,%0d,1", $time, a, b, o_p, exp_p);
             end
         end
     endtask
@@ -93,6 +110,7 @@ module mul_u_tb;
         end
         
         $display("num_tb PASS");    // if all tests passed, print PASS
+        $fclose(fd);
         $finish;                      // end simulation
     end
 
