@@ -21,37 +21,41 @@
 
 
 module mac_u(
-    input               i_clk,
-    input               i_rst_n,   // async active-low reset
-    input      [13:0]    i_a,
-    input      [13:0]    i_b,
-    input      [13:0]    i_c,
-    output reg [27:0]    o_y,
-    output reg           o_cout
-    );
+    input             i_clk,
+    input             i_rst_n,
+    input      [13:0]  i_a,
+    input      [13:0]  i_b,
+    input      [13:0]  i_c,
+    output reg [27:0]  o_y,
+    output reg         o_cout
+);
 
-    // --- stage registers ---
-    reg  [27:0] p;                 // 原来是 wire，现在改成乘法器结果寄存器
-    reg  [28:0] w_full_solution;   // 原来是 wire，现在改成加法器结果寄存器
+    // stage-1 regs (pipeline after multiply / align C)
+    reg [27:0] p_r;     // registered product
+    reg [13:0] c_r;     // registered C (aligned with p_r)
 
-    // 乘法器 + 加法器都“封装成寄存器”后再往下处理
-    always @(negedge i_rst_n or posedge i_clk) begin
+    // stage-2 comb (only adder in this stage)
+    wire [28:0] sum_w = {1'b0, p_r} + {15'b0, c_r};
+
+    always @(posedge i_clk or negedge i_rst_n) begin
         if (!i_rst_n) begin
-            p               <= 28'b0;
-            w_full_solution <= 29'b0;
-            o_y             <= 28'b0;
-            o_cout          <= 1'b0;
+            p_r    <= 28'd0;
+            c_r    <= 14'd0;
+            o_y    <= 28'd0;
+            o_cout <= 1'b0;
         end else begin
-            // stage 1: MUL -> reg
-            p <= i_a * i_b;   // 14b * 14b = 28b
+            // -------- stage 1: multiply only --------
+            p_r <= i_a * i_b;
+            c_r <= i_c;
 
-            // stage 2: ADD -> reg (注意这里用的是“上一拍”的 p)
-            w_full_solution <= {1'b0, p} + {15'b0, i_c};
-
-            // stage 3: output -> reg (用的是“上一拍”的 w_full_solution)
-            o_y    <= w_full_solution[27:0];
-            o_cout <= w_full_solution[28];
+            // -------- stage 2: add only (uses previous p_r/c_r) --------
+            o_y    <= sum_w[27:0];
+            o_cout <= sum_w[28];
         end
     end
 
 endmodule
+
+
+
+
