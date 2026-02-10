@@ -22,19 +22,20 @@
 
 module mac_u_tb;
 
-    parameter A_W = 14;
-    parameter B_W = 14;
-    parameter C_W = 14;
-    parameter Y_W = 28;
-    parameter COUT_W = 1;
+    parameter A_W = 8;
+    parameter B_W = 8;
+    parameter C_W = 8;
+    parameter Y_W = 16;
+    parameter LAT = 2;   // <-- design is 2-stage pipelined
     
     reg i_clk;
     reg i_rst_n;
     reg [A_W-1:0] i_a;
     reg [B_W-1:0] i_b;
     reg [C_W-1:0] i_c;
+    
     wire [Y_W-1:0] o_y;
-    wire o_cout;
+    wire           o_cout;
     
     initial i_clk = 1'b0;
     always begin 

@@ -21,41 +21,42 @@
 
 
 module mac_u(
-    input             i_clk,
-    input             i_rst_n,
-    input      [13:0]  i_a,
-    input      [13:0]  i_b,
-    input      [13:0]  i_c,
-    output reg [27:0]  o_y,
-    output reg         o_cout
-);
+    input               i_clk,
+    input               i_rst_n,   // async active-low reset
+    input      [7:0]    i_a,
+    input      [7:0]    i_b,
+    input      [7:0]    i_c,
+    output reg [15:0]    o_y,
+    output reg           o_cout
+    );
 
-    // stage-1 regs (pipeline after multiply / align C)
-    reg [27:0] p_r;     // registered product
-    reg [13:0] c_r;     // registered C (aligned with p_r)
+    // --- stage registers ---
+    reg [15:0] prod;                
+    reg [7:0] c;
 
-    // stage-2 comb (only adder in this stage)
-    wire [28:0] sum_w = {1'b0, p_r} + {15'b0, c_r};
 
-    always @(posedge i_clk or negedge i_rst_n) begin
+    // ----- stage 1
+    always @(negedge i_rst_n or posedge i_clk) begin
         if (!i_rst_n) begin
-            p_r    <= 28'd0;
-            c_r    <= 14'd0;
-            o_y    <= 28'd0;
-            o_cout <= 1'b0;
+            prod   <= 16'b0;
+            c      <= 8'b0;
         end else begin
-            // -------- stage 1: multiply only --------
-            p_r <= i_a * i_b;
-            c_r <= i_c;
-
-            // -------- stage 2: add only (uses previous p_r/c_r) --------
-            o_y    <= sum_w[27:0];
-            o_cout <= sum_w[28];
+            prod <= i_a * i_b;  
+            c    <= i_c;
+        end
+    end
+    
+    // ----- stage 2
+    wire [16:0] sum = {1'b0, prod} + {9'b0, c};
+    
+    always @(negedge i_rst_n or posedge i_clk) begin
+        if (!i_rst_n) begin
+            o_y        <= 16'b0;
+            o_cout     <= 1'b0;
+        end else begin
+            o_y        <= sum[15:0];
+            o_cout     <= sum[16];
         end
     end
 
 endmodule
-
-
-
-
