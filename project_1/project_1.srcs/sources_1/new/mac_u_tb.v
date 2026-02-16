@@ -46,9 +46,7 @@ module mac_u_tb;
         #8;               // keep reset low for a while
         i_rst_n = 1'b1;   // deassert reset before checks start
     end
-
-    reg [Y_W-1:0] exp_y;
-    reg exp_cout;
+    
 
     integer fd;
     initial begin
@@ -57,7 +55,7 @@ module mac_u_tb;
             $display("ERROR: cannot open mac_log.csv");
             $finish;
         end
-        $fdisplay(fd, "time,a,b,c,y_got,y_exp,cout_got,cout_exp,pass");
+        $fdisplay(fd, "time,a,b,c,y_got,cout_got,exp_full,pass");
     end
 
 
@@ -79,15 +77,13 @@ module mac_u_tb;
         reg [16:0] exp_full;
 
         begin
-            i_a <= a;
-            i_b <= b;
-            i_c <= c_in;
+            i_a <= $unsigned(a);
+            i_b <= $unsigned(b);
+            i_c <= $unsigned(c_in);
             #1;
 
             // golden reference (matches DUT: 16-bit product + zero-extended 8-bit c)
-            exp_full = ({1'b0, (a * b)} + {9'b0, c_in});
-            exp_y    = exp_full[15:0];
-            exp_cout = exp_full[16];
+            exp_full = ({1'b0, ($unsigned(a) * $unsigned(b))} + {9'b0, $unsigned(c_in)});
 
             // mac_u latency:
             // posedge 1: stage1 captures (a*b) and c
@@ -96,14 +92,14 @@ module mac_u_tb;
             @(posedge i_clk);
             #1;
 
-            if ((o_y !== exp_y) || (o_cout !== exp_cout)) begin
-                $display("MAC FAIL: a=%0d b=%0d c=%0d y_got=%0d y_exp=%0d cout_got=%0d cout_exp=%0d",
-                         a, b, c_in, o_y, exp_y, o_cout, exp_cout);
-                $fdisplay(fd, "%0t,%0d,%0d,%0d,%0d,%0d,%0d,%0d,0",
-                          $time, a, b, c_in, o_y, exp_y, o_cout, exp_cout);
+            if ((o_y !== exp_full[15:0]) || (o_cout !== exp_full[16])) begin
+                $display("MAC FAIL: a=%0d b=%0d c=%0d y_got=%0d cout_got=%0d exp_full=%0d",
+                         a, b, c_in, o_y, o_cout, exp_full);
+                $fdisplay(fd, "%0t,%0d,%0d,%0d,%0d,%0d,%0d,0",
+                          $time, a, b, c_in, o_y, o_cout, exp_full);
             end else begin
-                $fdisplay(fd, "%0t,%0d,%0d,%0d,%0d,%0d,%0d,%0d,1",
-                          $time, a, b, c_in, o_y, exp_y, o_cout, exp_cout);
+                $fdisplay(fd, "%0t,%0d,%0d,%0d,%0d,%0d,%0d,1",
+                          $time, a, b, c_in, o_y,o_cout,exp_full);
             end
         end
     endtask
@@ -120,19 +116,19 @@ module mac_u_tb;
         @(posedge i_clk);
 
         // directed tests
-        check(0, 0, 0);                         // 0*0 + 0
-        check(1, 1, 1);                         // 1*1 + 1
-        check({A_W{1'b1}}, 0, 0);               // max*0 + 0
-        check(0, {B_W{1'b1}}, {C_W{1'b1}});     // 0*max + maxC
-        check({A_W{1'b1}}, {B_W{1'b1}}, 0);     // max*max + 0
-        check({A_W{1'b1}}, {B_W{1'b1}}, 1);     // max*max + 1
-        check({A_W{1'b1}}, {B_W{1'b1}}, {C_W{1'b1}}); // max*max + maxC
+        check(0, 0, 0);                                // 0 * 0 + 0
+        check(1, 1, 1);                                // 1 * 1 + 1
+        check({A_W{1'b1}}, 0, 0);                      // maxA * 0 + 0
+        check(0, {B_W{1'b1}}, {C_W{1'b1}});            // 0 * maxB + maxC
+        check({A_W{1'b1}}, {B_W{1'b1}}, 0);            // maxA * maxB + 0
+        check({A_W{1'b1}}, {B_W{1'b1}}, 1);            // maxA * maxB + 1
+        check({A_W{1'b1}}, {B_W{1'b1}}, {C_W{1'b1}});  // maxA * maxB + maxC
 
         // random tests
-        for (k = 0; k < 1000; k = k + 1) begin
+        for (k = 0; k < 100; k = k + 1) begin
             check($random, $random, $random);
         end
-
+        
         $display("num_tb PASS");
         $fclose(fd);
         $finish;

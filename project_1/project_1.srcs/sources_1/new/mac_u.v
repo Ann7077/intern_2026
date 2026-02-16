@@ -26,8 +26,8 @@ module mac_u(
     input      [7:0]    i_a,
     input      [7:0]    i_b,
     input      [7:0]    i_c,
-    output reg [15:0]    o_y,
-    output reg           o_cout
+    output reg [15:0]    o_y,    // i_a * i_b + i_c
+    output reg           o_cout 
     );
 
     // --- stage registers ---
@@ -46,7 +46,7 @@ module mac_u(
         end
     end
     
-    // ----- stage 2
+    // ----- stage 2  
     wire [16:0] sum = {1'b0, prod} + {9'b0, c};
     
     always @(negedge i_rst_n or posedge i_clk) begin
@@ -59,4 +59,9 @@ module mac_u(
         end
     end
 
+    
 endmodule
+
+// no reset (no negedge)
+// cout is unnecessary, no overflow exists
+// mac_u is fine, mac_u_tb is not correct (use excel to do calculation)
