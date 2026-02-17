@@ -77,14 +77,14 @@ module mac_u_tb;
         reg [16:0] exp_full;
 
         begin
-            i_a <= $unsigned(a);
-            i_b <= $unsigned(b);
-            i_c <= $unsigned(c_in);
+            i_a <= a;
+            i_b <= b;
+            i_c <= c_in;
             #1;
 
             // golden reference (matches DUT: 16-bit product + zero-extended 8-bit c)
-            exp_full = ({1'b0, ($unsigned(a) * $unsigned(b))} + {9'b0, $unsigned(c_in)});
-
+            exp_full = a * b + c_in;
+            
             // mac_u latency:
             // posedge 1: stage1 captures (a*b) and c
             // posedge 2: stage2 outputs sum from previous stage1 regs
