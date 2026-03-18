@@ -25,7 +25,7 @@ module mac_u_tb;
     parameter A_W    = 8;
     parameter B_W    = 8;
     parameter C_W    = 8;
-    parameter Y_W    = 16;
+    parameter Y_W    = 8;
     parameter COUT_W = 1;
 
     reg i_clk;
@@ -74,7 +74,9 @@ module mac_u_tb;
         input [B_W-1:0] b;
         input [C_W-1:0] c_in;
 
-        reg [16:0] exp_full;
+        reg [8:0] exp_full;
+        reg [15:0] exp_prod_1;
+        reg [7:0] exp_prod;
 
         begin
             i_a <= a;
@@ -83,7 +85,9 @@ module mac_u_tb;
             #1;
 
             // golden reference (matches DUT: 16-bit product + zero-extended 8-bit c)
-            exp_full = a * b + c_in;
+            exp_prod_1 = a * b;
+            exp_prod = exp_prod_1[15:8];
+            exp_full = exp_prod + c_in;
             
             // mac_u latency:
             // posedge 1: stage1 captures (a*b) and c
@@ -92,7 +96,7 @@ module mac_u_tb;
             @(posedge i_clk);
             #1;
 
-            if ((o_y !== exp_full[15:0]) || (o_cout !== exp_full[16])) begin
+            if ((o_y !== exp_full[7:0]) || (o_cout !== exp_full[8])) begin
                 $display("MAC FAIL: a=%0d b=%0d c=%0d y_got=%0d cout_got=%0d exp_full=%0d",
                          a, b, c_in, o_y, o_cout, exp_full);
                 $fdisplay(fd, "%0t,%0d,%0d,%0d,%0d,%0d,%0d,0",
@@ -135,7 +139,6 @@ module mac_u_tb;
     end
 
 endmodule
-
 
 
 

@@ -26,36 +26,39 @@ module mac_u(
     input      [7:0]    i_a,
     input      [7:0]    i_b,
     input      [7:0]    i_c,
-    output reg [15:0]    o_y,    // i_a * i_b + i_c
-    output reg           o_cout 
+    output reg [7:0]    o_y,    // i_a * i_b + i_c
+    output reg          o_cout 
     );
 
     // --- stage registers ---
-    reg [15:0] prod;                
+    reg [7:0] prod;                
     reg [7:0] c;
 
-
     // ----- stage 1
+    wire [15:0] mult;
+    assign mult = i_a * i_b;
+    
     always @(negedge i_rst_n or posedge i_clk) begin
         if (!i_rst_n) begin
-            prod   <= 16'b0;
-            c      <= 8'b0;
+            prod <= 8'b0;
+            c    <= 8'b0;
         end else begin
-            prod <= i_a * i_b;  
+            prod <= mult[15:8]; 
             c    <= i_c;
         end
     end
     
     // ----- stage 2  
-    wire [16:0] sum = {1'b0, prod} + {9'b0, c};
+    wire [8:0] sum;
+    assign sum = {1'b0, prod[7:0]} + {1'b0, c};
     
     always @(negedge i_rst_n or posedge i_clk) begin
         if (!i_rst_n) begin
-            o_y        <= 16'b0;
+            o_y        <= 8'b0;
             o_cout     <= 1'b0;
         end else begin
-            o_y        <= sum[15:0];
-            o_cout     <= sum[16];
+            o_y        <= sum[7:0];
+            o_cout     <= sum[8];
         end
     end
 
