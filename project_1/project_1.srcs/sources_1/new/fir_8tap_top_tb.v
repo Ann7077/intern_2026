@@ -64,6 +64,8 @@ integer coeff [0:7];
 
 integer expected;
 
+reg [7:0] expected_d1, expected_d2;
+
 
 // coefficients
 initial begin
@@ -135,6 +137,17 @@ initial begin
 end
 
 
+
+always @(posedge i_clk or negedge i_rst_n) begin
+    if(!i_rst_n) begin
+        expected_d1 <= 0;
+        expected_d2 <= 0;
+    end else begin
+        expected_d1 <= expected[7:0];
+        expected_d2 <= expected_d1;
+    end
+end
+
 // -------------------------------------------------
 // Display comparison
 // -------------------------------------------------
@@ -146,7 +159,7 @@ always @(posedge i_clk) begin
                  i_x,
                  o_y,
                  expected,
-                 (o_y==expected[7:0]) ? "PASS" : "FAIL");
+                 (o_y==expected_d2) ? "PASS" : "FAIL");
     end
 end
 

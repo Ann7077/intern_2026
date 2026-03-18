@@ -43,7 +43,7 @@ module mac_u(
             prod <= 8'b0;
             c    <= 8'b0;
         end else begin
-            prod <= mult[15:8]; 
+            prod <= mult[7:0]; 
             c    <= i_c;
         end
     end

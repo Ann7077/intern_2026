@@ -86,7 +86,7 @@ module mac_u_tb;
 
             // golden reference (matches DUT: 16-bit product + zero-extended 8-bit c)
             exp_prod_1 = a * b;
-            exp_prod = exp_prod_1[15:8];
+            exp_prod = exp_prod_1[7:0]; //////
             exp_full = exp_prod + c_in;
             
             // mac_u latency:
