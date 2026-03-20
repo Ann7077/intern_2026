@@ -21,17 +21,17 @@
 
 
 module mac_u (
-    input              i_clk,
-    input              i_rst_n,
-    input      [7:0]   i_a,   // unsigned
-    input      [7:0]   i_b,   // unsigned
-    input      [7:0]   i_c,   // unsigned
-    output reg [7:0]   o_y,
-    output reg         o_cout
+    input                     i_clk,
+    input                     i_rst_n,
+    input signed      [7:0]   i_a,   
+    input signed      [7:0]   i_b,   
+    input signed      [7:0]   i_c, 
+    output reg signed [7:0]   o_y,
+    output reg signed         o_cout
 );
 
 // stage 1: full precision multiply
-reg [15:0] mult;
+reg signed [15:0] mult;
 
 always @(posedge i_clk or negedge i_rst_n) begin
     if (!i_rst_n)
@@ -41,7 +41,7 @@ always @(posedge i_clk or negedge i_rst_n) begin
 end
 
 // stage 2: scale ONCE, then accumulate
-reg [8:0] sum;  // 9-bit to catch overflow
+reg signed [8:0] sum;  
 
 always @(posedge i_clk or negedge i_rst_n) begin
     if (!i_rst_n) begin
@@ -49,14 +49,15 @@ always @(posedge i_clk or negedge i_rst_n) begin
         o_cout <= 1'b0;
     end else begin
         // scale multiplication result ONCE
-        sum = (mult >> 8) + i_c;
+        sum = (mult >>> 7) + i_c;
 
-        o_y    <= sum[7:0];
-        o_cout <= sum[8];
+        if (sum[8] != sum[7]) begin
+            o_y = sum[8] ? 8'b10000000 : 8'b01111111;   // saturated
+        end else begin
+            o_y = sum[7:0];   // no overflow, normal truncation
+        end
+        o_cout = (sum[8] != sum[7]);   // indicate truncation occured
     end
 end
 
 endmodule
-// no reset (no negedge)
-// cout is unnecessary, no overflow exists
-// mac_u is fine, mac_u_tb is not correct (use excel to do calculation)
