@@ -31,13 +31,18 @@ module mac_u (
 );
 
 // stage 1: full precision multiply
-reg signed [15:0] mult;
+reg signed [15:0] mult; 
+reg signed [7:0] i_c_d;
 
 always @(posedge i_clk or negedge i_rst_n) begin
-    if (!i_rst_n)
-        mult <= 16'd0;
-    else
-        mult <= i_a * i_b;
+    if (!i_rst_n) begin
+        mult <= 16'd0; 
+        i_c_d <= 8'd0;
+    end 
+    else begin
+        mult <= i_a * i_b; 
+        i_c_d <= i_c;
+    end
 end
 
 // stage 2: scale ONCE, then accumulate
@@ -49,7 +54,7 @@ always @(posedge i_clk or negedge i_rst_n) begin
         o_cout <= 1'b0;
     end else begin
         // scale multiplication result ONCE
-        sum <= (mult >>> 7) + i_c;
+        sum <= (mult >>> 7) + i_c_d; //52
 
         if (sum[8] != sum[7]) begin
             o_y <= sum[8] ? 8'b10000000 : 8'b01111111;   // saturated
