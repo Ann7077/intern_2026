@@ -52,11 +52,11 @@ always @(posedge i_clk or negedge i_rst_n) begin
         sum = (mult >>> 7) + i_c;
 
         if (sum[8] != sum[7]) begin
-            o_y = sum[8] ? 8'b10000000 : 8'b01111111;   // saturated
+            o_y <= sum[8] ? 8'b10000000 : 8'b01111111;   // saturated
         end else begin
-            o_y = sum[7:0];   // no overflow, normal truncation
+            o_y <= sum[7:0];   // no overflow, normal truncation
         end
-        o_cout = (sum[8] != sum[7]);   // indicate truncation occured
+        o_cout <= (sum[8] != sum[7]);   // indicate truncation occured
     end
 end
 
