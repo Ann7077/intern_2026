@@ -67,49 +67,24 @@ localparam B7 = 17;
 
 // MAC outputs
 wire [7:0] y0,y1,y2,y3,y4,y5,y6,y7;
-wire c0,c1,c2,c3,c4,c5,c6,c7;
+wire       c0,c1,c2,c3,c4,c5,c6,c7;
+
+mac_u m0(i_clk, i_rst_n, x0, B0, 8'd0, y0, c0);
+mac_u m1(i_clk, i_rst_n, x1, B1, y0,   y1, c1);
+mac_u m2(i_clk, i_rst_n, x2, B2, y1,   y2, c2);
+mac_u m3(i_clk, i_rst_n, x3, B3, y2,   y3, c3);
+mac_u m4(i_clk, i_rst_n, x4, B4, y3,   y4, c4);
+mac_u m5(i_clk, i_rst_n, x5, B5, y4,   y5, c5);
+mac_u m6(i_clk, i_rst_n, x6, B6, y5,   y6, c6);
+mac_u m7(i_clk, i_rst_n, x7, B7, y6,   y7, c7);
 
 
-// multiply using mac_u
-mac_u m0(i_clk,i_rst_n,x0,B0,8'd0,y0,c0);
-mac_u m1(i_clk,i_rst_n,x1,B1,8'd0,y1,c1);
-mac_u m2(i_clk,i_rst_n,x2,B2,8'd0,y2,c2);
-mac_u m3(i_clk,i_rst_n,x3,B3,8'd0,y3,c3);
-mac_u m4(i_clk,i_rst_n,x4,B4,8'd0,y4,c4);
-mac_u m5(i_clk,i_rst_n,x5,B5,8'd0,y5,c5);
-mac_u m6(i_clk,i_rst_n,x6,B6,8'd0,y6,c6);
-mac_u m7(i_clk,i_rst_n,x7,B7,8'd0,y7,c7);
-
-
-// extend to match previous sum structure
-wire [15:0] p0 = {8'b0, y0};
-wire [15:0] p1 = {8'b0, y1};
-wire [15:0] p2 = {8'b0, y2};
-wire [15:0] p3 = {8'b0, y3};
-wire [15:0] p4 = {8'b0, y4};
-wire [15:0] p5 = {8'b0, y5};
-wire [15:0] p6 = {8'b0, y6};
-wire [15:0] p7 = {8'b0, y7};
-
-
-// full FIR sum (unchanged structure)
-wire [19:0] sum =
-      p0
-    + p1
-    + p2
-    + p3
-    + p4
-    + p5
-    + p6
-    + p7;
-
-
-// output lower 8 bits (unchanged)
+// output register (final stage)
 always @(posedge i_clk or negedge i_rst_n) begin
     if(!i_rst_n)
         o_y <= 0;
     else
-        o_y <= sum[7:0];
+        o_y <= y7;
 end
 
 endmodule

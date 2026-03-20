@@ -20,51 +20,43 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module mac_u(
-    input               i_clk,
-    input               i_rst_n,   // async active-low reset
-    input      [7:0]    i_a,
-    input      [7:0]    i_b,
-    input      [7:0]    i_c,
-    output reg [7:0]    o_y,    // i_a * i_b + i_c
-    output reg          o_cout 
-    );
+module mac_u (
+    input              i_clk,
+    input              i_rst_n,
+    input      [7:0]   i_a,   // unsigned
+    input      [7:0]   i_b,   // unsigned
+    input      [7:0]   i_c,   // unsigned
+    output reg [7:0]   o_y,
+    output reg         o_cout
+);
 
-    // --- stage registers ---
-    reg [7:0] prod;                
-    reg [7:0] c;
+// stage 1: full precision multiply
+reg [15:0] mult;
 
-    // ----- stage 1
-    wire [15:0] mult;
-    assign mult = i_a * i_b;
-    
-    always @(negedge i_rst_n or posedge i_clk) begin
-        if (!i_rst_n) begin
-            prod <= 8'b0;
-            c    <= 8'b0;
-        end else begin
-            prod <= mult[7:0]; 
-            c    <= i_c;
-        end
+always @(posedge i_clk or negedge i_rst_n) begin
+    if (!i_rst_n)
+        mult <= 16'd0;
+    else
+        mult <= i_a * i_b;
+end
+
+// stage 2: scale ONCE, then accumulate
+reg [8:0] sum;  // 9-bit to catch overflow
+
+always @(posedge i_clk or negedge i_rst_n) begin
+    if (!i_rst_n) begin
+        o_y    <= 8'd0;
+        o_cout <= 1'b0;
+    end else begin
+        // scale multiplication result ONCE
+        sum = (mult >> 8) + i_c;
+
+        o_y    <= sum[7:0];
+        o_cout <= sum[8];
     end
-    
-    // ----- stage 2  
-    wire [8:0] sum;
-    assign sum = {1'b0, prod[7:0]} + {1'b0, c};
-    
-    always @(negedge i_rst_n or posedge i_clk) begin
-        if (!i_rst_n) begin
-            o_y        <= 8'b0;
-            o_cout     <= 1'b0;
-        end else begin
-            o_y        <= sum[7:0];
-            o_cout     <= sum[8];
-        end
-    end
+end
 
-    
 endmodule
-
 // no reset (no negedge)
 // cout is unnecessary, no overflow exists
 // mac_u is fine, mac_u_tb is not correct (use excel to do calculation)
