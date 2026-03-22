@@ -23,16 +23,16 @@
 module mac_u (
     input                     i_clk,
     input                     i_rst_n,
-    input signed      [7:0]   i_a,   
-    input signed      [7:0]   i_b,   
-    input signed      [7:0]   i_c, 
-    output reg signed [7:0]   o_y,
-    output reg signed         o_cout
+    input signed      [7:0]   i_a,      // Q8.7
+    input signed      [7:0]   i_b,      // Q8.7
+    input signed      [7:0]   i_c,      // Q8.7
+    output reg signed [7:0]   o_y,     // Q8.7
+    output reg signed         o_cout   // saturation flag
 );
 
 // stage 1: full precision multiply
-reg signed [15:0] mult; 
-reg signed [7:0]  i_c_d;
+reg signed [15:0] mult;   // only need Q15.14, but we are using Q16.4 here
+reg signed [7:0]  i_c_d;  // delay version of i_c, Q8.7
 
 always @(posedge i_clk or negedge i_rst_n) begin
     if (!i_rst_n) begin
@@ -45,7 +45,7 @@ always @(posedge i_clk or negedge i_rst_n) begin
 end
 
 // stage 2: scale ONCE, then accumulate
-reg signed [8:0] sum;  
+reg signed [8:0] sum;   // Q9.7
 
 always @(posedge i_clk or negedge i_rst_n) begin
     if (!i_rst_n) begin
