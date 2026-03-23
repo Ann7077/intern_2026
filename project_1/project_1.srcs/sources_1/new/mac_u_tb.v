@@ -134,6 +134,7 @@ module mac_u_tb;
         check(120, -120, -50);   // max negative, o_y = -128, o_cout = 1
         check(127, 1, 127);      // edge case, o_y = 127, o_cout = 0
         check(127, 2, 127);      // just over, o_y = 127, o_cout = 1
+        // add a test case for just over and edge case neg
         
         check({A_W{1'b1}}, 0, 0);
         check(0, {B_W{1'b1}}, {C_W{1'b1}});

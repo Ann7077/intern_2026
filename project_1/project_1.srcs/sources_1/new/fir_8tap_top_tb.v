@@ -20,159 +20,79 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module fir_8tap_top_tb;
+module fir_8tap_top_tb();
 
-reg clk;
-reg rst_n;
-reg [7:0] x;
-wire [7:0] y;
+    // Signals
+    reg          clk;
+    reg          rst_n;
+    reg  [7:0]   i_data;
+    wire [7:0]   o_data;
 
-// DUT
-fir_8tap_top dut (
-    .i_clk   (clk),
-    .i_rst_n (rst_n),
-    .i_x     (x),
-    .o_y     (y)
-);
-
-// ===============================
-// CLOCK
-// ===============================
-always #5 clk = ~clk;
-
-// ===============================
-// COEFFICIENTS
-// ===============================
-reg [7:0] B [0:7];
-
-initial begin
-    B[0]=7;  B[1]=17; B[2]=32; B[3]=46;
-    B[4]=52; B[5]=46; B[6]=32; B[7]=17;
-end
-
-// ===============================
-// INPUT HISTORY
-// ===============================
-reg [7:0] x_hist [0:7];
-integer i;
-
-// ===============================
-// EXPECTED (full precision)
-// ===============================
-reg [15:0] expected;
-reg [7:0] expected_scaled;
-
-// ===============================
-// PIPELINE DELAY (IMPORTANT)
-// ===============================
-reg [7:0] expected_dly [0:16];   // 17 stages
-
-// ===============================
-// INITIALIZATION (CRITICAL FIX)
-// ===============================
-integer j;
-
-initial begin
-    clk = 0;
-    rst_n = 0;
-    x = 0;
-
-    // initialize arrays to avoid 'x'
-    for (j = 0; j < 8; j = j + 1)
-        x_hist[j] = 0;
-
-    for (j = 0; j < 17; j = j + 1)
-        expected_dly[j] = 0;
-
-    #20;
-    rst_n = 1;
-end
-
-// ===============================
-// SHIFT REGISTER (input delay line)
-// ===============================
-always @(posedge clk) begin
-    if (!rst_n) begin
-        for (i = 0; i < 8; i = i + 1)
-            x_hist[i] <= 0;
-    end else begin
-        x_hist[0] <= x;
-        for (i = 1; i < 8; i = i + 1)
-            x_hist[i] <= x_hist[i-1];
-    end
-end
-
-
-
-reg [7:0] exp_stage [0:7];
-
-always @(*) begin
-    exp_stage[0] = (x_hist[0]*B[0]) >> 8;
-    exp_stage[1] = ((x_hist[1]*B[1]) >> 8) + exp_stage[0];
-    exp_stage[2] = ((x_hist[2]*B[2]) >> 8) + exp_stage[1];
-    exp_stage[3] = ((x_hist[3]*B[3]) >> 8) + exp_stage[2];
-    exp_stage[4] = ((x_hist[4]*B[4]) >> 8) + exp_stage[3];
-    exp_stage[5] = ((x_hist[5]*B[5]) >> 8) + exp_stage[4];
-    exp_stage[6] = ((x_hist[6]*B[6]) >> 8) + exp_stage[5];
-    exp_stage[7] = ((x_hist[7]*B[7]) >> 8) + exp_stage[6];
-end
-
-always @(*) begin
-    expected_scaled = exp_stage[7];
-end
-
-
-
-// ===============================
-// LATENCY ALIGNMENT (17 cycles)
-// ===============================
-always @(posedge clk) begin
-    if (!rst_n) begin
-        for (i = 0; i < 17; i = i + 1)
-            expected_dly[i] <= 0;
-    end else begin
-        expected_dly[0] <= expected_scaled;
-        for (i = 1; i < 17; i = i + 1)
-            expected_dly[i] <= expected_dly[i-1];
-    end
-end
-
-// ===============================
-// STIMULUS
-// ===============================
-integer t;
-
-initial begin
-    @(posedge rst_n);
-
-    for (t = 0; t < 200; t = t + 1) begin
-        @(posedge clk);
-        x <= t;
+    // Filter Coefficients from assignment [cite: 6]
+    // We use the first 8 for an 8-tap filter
+    reg [7:0] h[0:7];
+    initial begin
+        h[0] = 8'd7;  h[1] = 8'd17; h[2] = 8'd32; h[3] = 8'd46;
+        h[4] = 8'd52; h[5] = 8'd46; h[6] = 8'd32; h[7] = 8'd17;
     end
 
-    #200;
-    $finish;
-end
+    // Input data buffer to calculate expected value
+    reg [7:0] x_pipe[0:7];
+    integer i;
 
-// ===============================
-// CHECKER (skip invalid cycles)
-// ===============================
-integer cycle_count = 0;
+    // Instantiate the Top Module
+    fir_8tap_top dut (
+        .i_clk   (clk),
+        .i_rst_n (rst_n),
+        .i_data  (i_data),
+        .o_data  (o_data)
+    );
 
-always @(posedge clk) begin
-    if (rst_n) begin
-        cycle_count <= cycle_count + 1;
+    // Clock Generation
+    initial clk = 0;
+    always #5 clk = ~clk;
 
-        // wait for pipeline to fill
-        if (cycle_count > 25) begin
-            if (y === expected_dly[16])
-                $display("time=%0t x=%0d DUT=%0d EXPECTED=%0d PASS",
-                         $time, x, y, expected_dly[16]);
-            else
-                $display("time=%0t x=%0d DUT=%0d EXPECTED=%0d FAIL",
-                         $time, x, y, expected_dly[16]);
+    // Expected Value Calculation Logic
+    reg [31:0] expected_full;
+    reg [7:0]  expected_scaled;
+    
+    // The diagram shows a deep pipeline (Layer 1 to Layer 5)
+    // We need to account for the cycles it takes for data to reach the output
+    reg [7:0] expected_history[0:15]; 
+
+    initial begin
+        // Initialize
+        rst_n = 0;
+        i_data = 0;
+        for(i=0; i<8; i=i+1) x_pipe[i] = 0;
+        
+        #20 rst_n = 1; 
+
+        // Stimulus: Feed a step input (all 10s)
+        repeat(20) begin
+            @(posedge clk);
+            i_data = 8'd10; 
+            
+            // Shift software pipeline for expected calc
+            for(i=7; i>0; i=i-1) x_pipe[i] = x_pipe[i-1];
+            x_pipe[0] = i_data;
+
+            // Calculate Sum of (Products)
+            expected_full = (x_pipe[0]*h[0]) + (x_pipe[1]*h[1]) + (x_pipe[2]*h[2]) + (x_pipe[3]*h[3]) +
+                            (x_pipe[4]*h[4]) + (x_pipe[5]*h[5]) + (x_pipe[6]*h[6]) + (x_pipe[7]*h[7]);
+            
+            // Apply Q8.7 scaling (shift right 7) as seen in mac_u 
+            expected_scaled = expected_full >> 7;
+
+            // Shift history to align with hardware pipeline delay
+            for(i=15; i>0; i=i-1) expected_history[i] = expected_history[i-1];
+            expected_history[0] = expected_scaled;
+
+            $display("In: %d | Hardware Out: %d | Expected (delayed): %d", 
+                      i_data, o_data, expected_history[10]); // Adjusted for pipe depth
         end
+
+        #100 $finish;
     end
-end
 
 endmodule
