@@ -3,7 +3,7 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 03/15/2026 01:45:22 PM
+// Create Date: 03/22/2026 09:15:00 PM
 // Design Name: 
 // Module Name: fir_8tap_top
 // Project Name: 
@@ -16,218 +16,166 @@
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
-//   Coefficients (8-tap symmetric): 7, 17, 32, 46, 52, 46, 32, 17, 7
+//   coefficient: {7, 17, 32, 46, 52, 46, 32, 17, 7}
 //////////////////////////////////////////////////////////////////////////////////
 
 
 module fir_8tap_top (
-    input            i_clk,
-    input            i_rst_n,
-    input      [7:0] i_data,   // Unsigned input
-    output     [7:0] o_data    // Unsigned output
+    input                     i_clk,
+    input                     i_rst_n,
+    input  signed      [7:0]  i_data,   // Q8.7
+    output reg signed  [7:0]  o_data    // Q8.7 (Final Truncated/Saturated)
 );
+    // Coefficients (Unsigned as requested: 7, 17, 32, 46, 52, 46, 32, 17, 7) 
+    // Even though coefficients are unsigned, we treat them as Q8.7 
+    // to maintain consistent fractional alignment. 
+    wire [7:0] h0 = 8'd7;
+    wire [7:0] h1 = 8'd17;
+    wire [7:0] h2 = 8'd32;
+    wire [7:0] h3 = 8'd46;
+    wire [7:0] h4 = 8'd52;
+    wire [7:0] h5 = 8'd46;
+    wire [7:0] h6 = 8'd32;
+    wire [7:0] h7 = 8'd17;
+    wire [7:0] h8 = 8'd7;
 
-    // --- Coefficients (Unsigned) ---
-    // Using the first 8 coefficients provided in the assignment
-    wire [7:0] c0 = 8'd7;
-    wire [7:0] c1 = 8'd17;
-    wire [7:0] c2 = 8'd32;
-    wire [7:0] c3 = 8'd46;
-    wire [7:0] c4 = 8'd52;
-    wire [7:0] c5 = 8'd46;
-    wire [7:0] c6 = 8'd32;
-    wire [7:0] c7 = 8'd17;
-
-    // --- Input Delay Line (Top row of 'D' in diagram) ---
-    reg [7:0] x0, x1, x2, x3, x4, x5, x6, x7;
+    // Delay Line for Input Data (X0 to X8) 
+    reg signed [7:0] x0, x1, x2, x3, x4, x5, x6, x7, x8;
     always @(posedge i_clk or negedge i_rst_n) begin
         if (!i_rst_n) begin
-            {x0, x1, x2, x3, x4, x5, x6, x7} <= 64'd0;
+            x0 <= 8'd0; x1 <= 8'd0; x2 <= 8'd0; 
+            x3 <= 8'd0; x4 <= 8'd0; x5 <= 8'd0; 
+            x6 <= 8'd0; x7 <= 8'd0; x8 <= 8'd0; 
         end else begin
-            x0 <= i_data;
-            x1 <= x0;
-            x2 <= x1;
-            x3 <= x2;
-            x4 <= x3;
+            x0 <= i_data; 
+            x1 <= x0; 
+            x2 <= x1; 
+            x3 <= x2; 
+            x4 <= x3; 
             x5 <= x4;
             x6 <= x5;
             x7 <= x6;
+            x8 <= x7;
         end
     end
 
-    // --- Layer 1 & 2: Multiplication and First Delay ---
-    // mac_u handles mult + add. For the first layer, we pass 0 as 'i_c'.
-    // Port mapping: i_a (data), i_b (coeff), i_c (accumulation)
-    wire [7:0] l2_m0, l2_m1, l2_m2, l2_m3, l2_m4, l2_m5, l2_m6, l2_m7;
+    // Intermediate Solution Wires (Truncated to 8-bit to match mac_u ports)
     
-    // Instance for Tap 0
-    mac_u u_mac0 (
-        .i_clk   (i_clk),
-        .i_rst_n (i_rst_n),
-        .i_a     ({1'b0, x0}), // Zero-extend for unsigned
-        .i_b     ({1'b0, c0}),
-        .i_c     (8'd0),
-        .o_y     (l2_m0),
-        .o_cout  ()
+    
+    // --- MAC Chain Implementation ---
+    // Note: These instances use the existing mac_u module 
+    wire signed [7:0] m0, m1, m2, m3, m4, m5, m6, m7, m8;
+    
+    // Step 1: m0 = x0 * h0 + 0
+    mac_u dut_m0 (
+        .i_clk(i_clk),
+        .i_rst_n(i_rst_n),
+        .i_a(x0),
+        .i_b(h0),
+        .i_c(8'd0), 
+        .o_y(m0) 
     );
 
-    // Instance for Tap 1
-    mac_u u_mac1 (
-        .i_clk   (i_clk),
-        .i_rst_n (i_rst_n),
-        .i_a     ({1'b0, x1}),
-        .i_b     ({1'b0, c1}),
-        .i_c     (8'd0),
-        .o_y     (l2_m1),
-        .o_cout  ()
+    // Step 2: m1 = x1 * h1 + m0
+    mac_u dut_m1 (
+        .i_clk(i_clk),
+        .i_rst_n(i_rst_n),
+        .i_a(x1),
+        .i_b(h1),
+        .i_c(m0),
+        .o_y(m1) 
     );
 
-    // Instance for Tap 2
-    mac_u u_mac2 (
-        .i_clk   (i_clk),
-        .i_rst_n (i_rst_n),
-        .i_a     ({1'b0, x2}),
-        .i_b     ({1'b0, c2}),
-        .i_c     (8'd0),
-        .o_y     (l2_m2),
-        .o_cout  ()
+    // Step 3: m2 = x2 * h2 + m1
+    mac_u dut_m2 (
+        .i_clk(i_clk),
+        .i_rst_n(i_rst_n),
+        .i_a(x2),
+        .i_b(h2),
+        .i_c(m1),
+        .o_y(m2) 
     );
 
-    // Instance for Tap 3
-    mac_u u_mac3 (
-        .i_clk   (i_clk),
-        .i_rst_n (i_rst_n),
-        .i_a     ({1'b0, x3}),
-        .i_b     ({1'b0, c3}),
-        .i_c     (8'd0),
-        .o_y     (l2_m3),
-        .o_cout  ()
+    // Step 4: m3 = x3 * h3 + m2
+    mac_u dut_m3 (
+        .i_clk(i_clk),
+        .i_rst_n(i_rst_n),
+        .i_a(x3),
+        .i_b(h3),
+        .i_c(m2),
+        .o_y(m3) 
     );
 
-    // Instance for Tap 4
-    mac_u u_mac4 (
-        .i_clk   (i_clk),
-        .i_rst_n (i_rst_n),
-        .i_a     ({1'b0, x4}),
-        .i_b     ({1'b0, c4}),
-        .i_c     (8'd0),
-        .o_y     (l2_m4),
-        .o_cout  ()
+    // Step 5: m4 = x4 * h4 + m3
+    mac_u dut_m4 (
+        .i_clk(i_clk),
+        .i_rst_n(i_rst_n),
+        .i_a(x4),
+        .i_b(h4),
+        .i_c(m3),
+        .o_y(m4) 
     );
 
-    // Instance for Tap 5
-    mac_u u_mac5 (
-        .i_clk   (i_clk),
-        .i_rst_n (i_rst_n),
-        .i_a     ({1'b0, x5}),
-        .i_b     ({1'b0, c5}),
-        .i_c     (8'd0),
-        .o_y     (l2_m5),
-        .o_cout  ()
+    // Step 6: m5 = x5 * h5 + m4
+    mac_u dut_m5 (
+        .i_clk(i_clk),
+        .i_rst_n(i_rst_n),
+        .i_a(x5),
+        .i_b(h5),
+        .i_c(m4),
+        .o_y(m5)
     );
 
-    // Instance for Tap 6
-    mac_u u_mac6 (
-        .i_clk   (i_clk),
-        .i_rst_n (i_rst_n),
-        .i_a     ({1'b0, x6}),
-        .i_b     ({1'b0, c6}),
-        .i_c     (8'd0),
-        .o_y     (l2_m6),
-        .o_cout  ()
+    // Step 7: m6 = x6 * h6 + m5
+    mac_u dut_m6 (
+        .i_clk(i_clk),
+        .i_rst_n(i_rst_n),
+        .i_a(x6),
+        .i_b(h6),
+        .i_c(m5),
+        .o_y(m6)
     );
 
-    // Instance for Tap 7
-    mac_u u_mac7 (
-        .i_clk   (i_clk),
-        .i_rst_n (i_rst_n),
-        .i_a     ({1'b0, x7}),
-        .i_b     ({1'b0, c7}),
-        .i_c     (8'd0),
-        .o_y     (l2_m7),
-        .o_cout  ()
+    // Step 8: m7 = x7 * h7 + m6
+    mac_u dut_m7 (
+        .i_clk(i_clk),
+        .i_rst_n(i_rst_n),
+        .i_a(x7),
+        .i_b(h7),
+        .i_c(m6),
+        .o_y(m7)
     );
 
-    // --- Layer 3: First Stage of Addition Tree ---
-    // Note: mac_u is used as an adder here by setting i_a*i_b to 0
-    wire [7:0] l3_sum0, l3_sum1, l3_sum2, l3_sum3;
-
-    mac_u u_add_l3_0 (
-        .i_clk   (i_clk),
-        .i_rst_n (i_rst_n),
-        .i_a     (8'd0),
-        .i_b     (8'd0),
-        .i_c     (l2_m0 + l2_m1),
-        .o_y     (l3_sum0),
-        .o_cout  ()
+    // Step 9: m8 = x8 * h8 + m7
+    mac_u dut_m8 (
+        .i_clk(i_clk),
+        .i_rst_n(i_rst_n),
+        .i_a(x8),
+        .i_b(h8),
+        .i_c(m7),
+        .o_y(m8)
     );
 
-    mac_u u_add_l3_1 (
-        .i_clk   (i_clk),
-        .i_rst_n (i_rst_n),
-        .i_a     (8'd0),
-        .i_b     (8'd0),
-        .i_c     (l2_m2 + l2_m3),
-        .o_y     (l3_sum1),
-        .o_cout  ()
-    );
+    // --- Step 5: Final Output (Saturation & Truncation) ---
+    // Note: Since mac_u is signed, the range is -128 to 127.
+    // m8 is our 8-bit signed input from the last MAC stage.
 
-    mac_u u_add_l3_2 (
-        .i_clk   (i_clk),
-        .i_rst_n (i_rst_n),
-        .i_a     (8'd0),
-        .i_b     (8'd0),
-        .i_c     (l2_m4 + l2_m5),
-        .o_y     (l3_sum2),
-        .o_cout  ()
-    );
-
-    mac_u u_add_l3_3 (
-        .i_clk   (i_clk),
-        .i_rst_n (i_rst_n),
-        .i_a     (8'd0),
-        .i_b     (8'd0),
-        .i_c     (l2_m6 + l2_m7),
-        .o_y     (l3_sum3),
-        .o_cout  ()
-    );
-
-    // --- Layer 4: Second Stage of Addition Tree ---
-    wire [7:0] l4_sum0, l4_sum1;
-
-    mac_u u_add_l4_0 (
-        .i_clk   (i_clk),
-        .i_rst_n (i_rst_n),
-        .i_a     (8'd0),
-        .i_b     (8'd0),
-        .i_c     (l3_sum0 + l3_sum1),
-        .o_y     (l4_sum0),
-        .o_cout  ()
-    );
-
-    mac_u u_add_l4_1 (
-        .i_clk   (i_clk),
-        .i_rst_n (i_rst_n),
-        .i_a     (8'd0),
-        .i_b     (8'd0),
-        .i_c     (l3_sum2 + l3_sum3),
-        .o_y     (l4_sum1),
-        .o_cout  ()
-    );
-
-    // --- Layer 5: Final Addition Stage ---
-    wire [7:0] l5_final;
-
-    mac_u u_add_l5 (
-        .i_clk   (i_clk),
-        .i_rst_n (i_rst_n),
-        .i_a     (8'd0),
-        .i_b     (8'd0),
-        .i_c     (l4_sum0 + l4_sum1),
-        .o_y     (l5_final),
-        .o_cout  ()
-    );
-
-    assign o_data = l5_final;
+    always @(posedge i_clk or negedge i_rst_n) begin
+        if (!i_rst_n) begin
+            o_data <= 8'd0;
+        end else begin
+            // Since m8 is already 8 bits from the MAC, 
+            // 'Truncation' is inherent. We implement saturation 
+            // logic here as a final boundary check.
+            
+            if (m8 > 8'sd127) begin
+                o_data <= 8'sd127;          // Positive Saturation
+            end else if (m8 < -8'sd128) begin
+                o_data <= -8'sd128;         // Negative Saturation
+            end else begin
+                o_data <= m8;               // Normal Truncated Output
+            end
+        end
+    end
 
 endmodule

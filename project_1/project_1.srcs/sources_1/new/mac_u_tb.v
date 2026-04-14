@@ -89,7 +89,7 @@ module mac_u_tb;
             // Stage 1: Multiplication
             prod = a * b;
             // Stage 2: Scale and Add (Matching: sum <= (mult >>> 7) + i_c_d)
-            sum = (prod >>> 7) + c_in;
+            sum = (prod >>> 8) + c_in;
             
             // Saturation Logic (Matching your sum[8] != sum[7] check)
             if (sum[8] != sum[7]) begin
@@ -130,11 +130,10 @@ module mac_u_tb;
         // --- Directed Tests ---
         check(0, 0, 0);
         check(1, 1, 1);
-        check(100, 100, 100);    // max positive, o_y = 127, o_cout = 1
-        check(120, -120, -50);   // max negative, o_y = -128, o_cout = 1
-        check(127, 1, 127);      // edge case, o_y = 127, o_cout = 0
-        check(127, 2, 127);      // just over, o_y = 127, o_cout = 1
-        // add a test case for just over and edge case neg
+        check(127, 127, 64);   // (16129/256) + 64 = 63 + 64 = 127 (Edge of positive)
+        check(127, 127, 65);   // (16129/256) + 65 = 63 + 65 = 128 (Should Saturate to 127)
+        check(-128, 127, -65); // (-16256/256) - 65 = -63 - 65 = -128 (Edge of negative)
+        check(-128, 127, -66); // (-16256/256) - 66 = -63 - 66 = -129 (Should Saturate to -128)
         
         check({A_W{1'b1}}, 0, 0);
         check(0, {B_W{1'b1}}, {C_W{1'b1}});
