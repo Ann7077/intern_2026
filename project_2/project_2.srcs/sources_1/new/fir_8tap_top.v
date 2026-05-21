@@ -83,7 +83,7 @@ module fir_8tap_top (
     // CORRECT MAC CHAIN (matches Python)
     // --------------------------------------------------
 
-    // M8 (first stage ¡ª DIRECT INPUT)
+    // M8 (first stage - DIRECT INPUT)
     mac_u dut_m8 (
         .i_clk(i_clk),
         .i_rst_n(i_rst_n),
@@ -166,7 +166,7 @@ module fir_8tap_top (
     );
 
     // --------------------------------------------------
-    // Final output (NO saturation ¡ª matches Python)
+    // Final output (NO saturation - matches Python)
     // --------------------------------------------------
     always @(posedge i_clk or negedge i_rst_n) begin
         if (!i_rst_n)
