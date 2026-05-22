@@ -53,7 +53,7 @@ wire valid;
 dds_compiler_0 your_instance_name (
   .aclk(clk),                                  // input wire aclk
   .s_axis_config_tvalid(1'b1),  // input wire s_axis_config_tvalid
-  .s_axis_config_tdata(32'd100),    // input wire [31 : 0] s_axis_config_tdata
+  .s_axis_config_tdata(32'd4000),    // input wire [31 : 0] s_axis_config_tdata
   .m_axis_data_tvalid(m_axis_data_tvalid),      // output wire m_axis_data_tvalid
   .m_axis_data_tdata(data),        // output wire [15 : 0] m_axis_data_tdata
   .m_axis_phase_tvalid(m_axis_phase_tvalid),    // output wire m_axis_phase_tvalid
@@ -79,8 +79,8 @@ end
 // 用来控制仿真运行时间
 initial begin
 
-    // 仿真运行5000ns
-    #5000;
+    // 仿真运行5000000ns
+    #5000000;
 
     // 结束仿真
     $finish;

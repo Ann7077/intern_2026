@@ -12,14 +12,14 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="1794000001fs"></ZoomEndTime>
-      <Cursor1Time time="235000000fs"></Cursor1Time>
+      <ZoomEndTime time="6160000000001fs"></ZoomEndTime>
+      <Cursor1Time time="5000000000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="175"></NameColumnWidth>
-      <ValueColumnWidth column_width="139"></ValueColumnWidth>
+      <ValueColumnWidth column_width="129"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="7" />
+   <WVObjectSize size="8" />
    <wvobject fp_name="/tb_dds/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -27,6 +27,77 @@
    <wvobject fp_name="/tb_dds/data" type="array">
       <obj_property name="ElementShortName">data[31:0]</obj_property>
       <obj_property name="ObjectShortName">data[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="vbus1210" type="vbus">
+      <obj_property name="label">cos</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <wvobject fp_name="/tb_dds/data[15]" type="logic">
+         <obj_property name="ElementShortName">[15]</obj_property>
+         <obj_property name="ObjectShortName">[15]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dds/data[14]" type="logic">
+         <obj_property name="ElementShortName">[14]</obj_property>
+         <obj_property name="ObjectShortName">[14]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dds/data[13]" type="logic">
+         <obj_property name="ElementShortName">[13]</obj_property>
+         <obj_property name="ObjectShortName">[13]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dds/data[12]" type="logic">
+         <obj_property name="ElementShortName">[12]</obj_property>
+         <obj_property name="ObjectShortName">[12]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dds/data[11]" type="logic">
+         <obj_property name="ElementShortName">[11]</obj_property>
+         <obj_property name="ObjectShortName">[11]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dds/data[10]" type="logic">
+         <obj_property name="ElementShortName">[10]</obj_property>
+         <obj_property name="ObjectShortName">[10]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dds/data[9]" type="logic">
+         <obj_property name="ElementShortName">[9]</obj_property>
+         <obj_property name="ObjectShortName">[9]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dds/data[8]" type="logic">
+         <obj_property name="ElementShortName">[8]</obj_property>
+         <obj_property name="ObjectShortName">[8]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dds/data[7]" type="logic">
+         <obj_property name="ElementShortName">[7]</obj_property>
+         <obj_property name="ObjectShortName">[7]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dds/data[6]" type="logic">
+         <obj_property name="ElementShortName">[6]</obj_property>
+         <obj_property name="ObjectShortName">[6]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dds/data[5]" type="logic">
+         <obj_property name="ElementShortName">[5]</obj_property>
+         <obj_property name="ObjectShortName">[5]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dds/data[4]" type="logic">
+         <obj_property name="ElementShortName">[4]</obj_property>
+         <obj_property name="ObjectShortName">[4]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dds/data[3]" type="logic">
+         <obj_property name="ElementShortName">[3]</obj_property>
+         <obj_property name="ObjectShortName">[3]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dds/data[2]" type="logic">
+         <obj_property name="ElementShortName">[2]</obj_property>
+         <obj_property name="ObjectShortName">[2]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dds/data[1]" type="logic">
+         <obj_property name="ElementShortName">[1]</obj_property>
+         <obj_property name="ObjectShortName">[1]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dds/data[0]" type="logic">
+         <obj_property name="ElementShortName">[0]</obj_property>
+         <obj_property name="ObjectShortName">[0]</obj_property>
+      </wvobject>
    </wvobject>
    <wvobject fp_name="vbus629" type="vbus">
       <obj_property name="label">sin</obj_property>
