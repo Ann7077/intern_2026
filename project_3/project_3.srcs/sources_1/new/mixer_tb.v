@@ -20,12 +20,32 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module mixer_tb(
+module mixer_tb;
     
-    parameter INPUT_W = 12;
-    parameter OUTPUT_W = 24;
+    parameter IN_W = 12;
+    parameter OUT_W = 24;
     
+    reg clk;
+    reg rst_n;
+    reg signed [IN_W-1:0] adc_data;
+    reg signed [IN_W-1:0] dds_cos;
+    reg signed [IN_W-1:0] dds_sin;
     
+    wire signed [OUT_W:0] i_out;
+    wire signed [OUT_W:0] q_out;
 
-    );
+
+    // clock generator
+    initial clk = 1'b0;
+    always begin 
+        #(10.000/2) clk = ~clk;   
+    end
+    
+    // reset generator
+    initial begin
+        rst_n = 1'b0;   // assert reset at t=0
+        #8;               // keep reset low for a while
+        rst_n = 1'b1;   // deassert reset before the 2nd check samples
+    end
+
 endmodule
