@@ -116,11 +116,19 @@ module mixer_tb;
         @(posedge clk);
         
         // specific case tests
-        check(0,0,0);                                   // test: 0 * 0 = 0, 0 * 0 = 0
-        check(1,{IN_W{1'b1}},{IN_W{1'b1}});             // test: 1 * max dds_cos, 1 * max dds_sin
-        check(0,{IN_W{1'b1}},{IN_W{1'b1}});             // test: 0 * max dds_cos, 0 * max dds_sin
-        check({IN_W{1'b1}},0,0);                        // test: max adc_data * 0, max adc_data * 0
-        check({IN_W{1'b1}},{IN_W{1'b1}},{IN_W{1'b1}});  // test: max adc_data * max dds_cos, max adc_data * dds_sin
+        check(0,0,0);  // test: 0 * 0 = 0, 0 * 0 = 0
+        
+            // positive: all 1 except first place is 0
+        check({1'b0, {(IN_W-1){1'b1}}}, 0, 0);  // test: max pos adc_data * 0, max pos adc_data * 0
+        check(1, {1'b0, {(IN_W-1){1'b1}}}, {1'b0, {(IN_W-1){1'b1}}});  // test: 1 * max pas dds_cos, 1 * max pas dds_sin
+        check(0, {1'b0, {(IN_W-1){1'b1}}}, {1'b0, {(IN_W-1){1'b1}}});  // test: 0 * pos max dds_cos, 0 * max pos dds_sin
+        check({1'b0, {(IN_W-1){1'b1}}}, {1'b0, {(IN_W-1){1'b1}}}, {1'b0, {(IN_W-1){1'b1}}});  // test: max pos adc_data * max pos dds_cos, max pos adc_data * max pos dds_sin
+        
+            // negative: all 0 except first place is 1
+        check({1'b1, {(IN_W-1){1'b0}}}, 0, 0);  // test: max neg adc_data * 0, max neg adc_data * 0
+        check(1, {1'b1, {(IN_W-1){1'b0}}}, {1'b1, {(IN_W-1){1'b0}}});  // test: 1 * max neg dds_cos, 1 * max neg dds_sin
+        check(0, {1'b1, {(IN_W-1){1'b0}}}, {1'b1, {(IN_W-1){1'b0}}});  // test: 0 * max neg dds_cos, 0 * max neg dds_sin
+        check({1'b1, {(IN_W-1){1'b0}}}, {1'b1, {(IN_W-1){1'b0}}}, {1'b1, {(IN_W-1){1'b0}}});  // test: max neg adc_data * max neg dds_cos, max neg adc_data * max neg dds_sin
         
         // random case tests * 1000
         for (k = 0; k < 1000; k = k + 1) begin   
