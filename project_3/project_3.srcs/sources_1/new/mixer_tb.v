@@ -75,6 +75,33 @@ module mixer_tb;
         .q_out(q_out)
     );
     
-    
+    // task named "check" for self-check
+    task check;  
+        input signed [IN_W-1:0] c_adc_data;
+        input signed [IN_W-1:0] c_dds_cos; 
+        input signed [IN_W-1:0] c_dds_sin;  
+        
+        begin
+            adc_data <= c_adc_data;  // set DUT input adc_data as task input c_adc_data
+            dds_cos  <= c_dds_cos;   // set DUT input dds_cos as task input c_dds_cos
+            dds_sin  <= c_dds_sin;   // set DUT input dds_sin as task input c_dds_sin
+            #1;                      // wait to stabilize the logic
+            
+            // expected output 
+            exp_i_out = c_adc_data * c_dds_cos;   
+            exp_q_out = c_adc_data * c_dds_sin;
+            
+            @(posedge clk);  // wait for registered output to update
+            #1;         
+            
+            if (i_out !== exp_i_out || q_out !== exp_q_out) begin
+                $display("MIXER FAIL: c_adc_data=%0d c_dds_cos=%0d c_dds_sin=%0d i_out=%0d q_out=%0d exp_i_out=%0d exp_q_out=%0d", 
+                          c_adc_data, c_dds_cos, c_dds_sin, i_out, q_out, exp_i_out, exp_q_out);
+                $fdisplay(fd, "%0t,%0d,%0d,%0d,%0d,%0d,%0d,%0d,0", $time, c_adc_data, c_dds_cos, c_dds_sin, i_out, q_out, exp_i_out, exp_q_out);
+            end else begin
+                $fdisplay(fd, "%0t,%0d,%0d,%0d,%0d,%0d,%0d,%0d,1", $time, c_adc_data, c_dds_cos, c_dds_sin, i_out, q_out, exp_i_out, exp_q_out);
+            end
+        end
+    endtask
 
 endmodule
