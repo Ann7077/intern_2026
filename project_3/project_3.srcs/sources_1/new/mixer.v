@@ -34,6 +34,14 @@ module mixer (
     output reg  signed [23:0] q_out       // separated Quadrature (Q) baseband path data (24-bit signed) 
 );
   
-
+    always @(negedge rst_n or posedge clk) begin
+        if (!rst_n) begin
+            i_out <= 24'd0;
+            q_out <= 24'd0;
+        end else begin
+            i_out <= adc_data * dds_cos;  
+            q_out <= adc_data * dds_sin;
+        end
+    end
 
 endmodule
