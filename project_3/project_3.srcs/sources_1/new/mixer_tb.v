@@ -47,5 +47,23 @@ module mixer_tb;
         #8;               // keep reset low for a while
         rst_n = 1'b1;   // deassert reset before the 2nd check samples
     end
+    
+    // expected outputs
+    reg signed [OUT_W:0] exp_i_out;
+    reg signed [OUT_W:0] exp_q_out;
+    
+    // generate csv file 
+    integer fd;
+    initial begin
+        fd = $fopen("mixer_log.csv", "w");
+        $display("LOG fd=%0d", fd);
+        if (fd == 0) begin
+            $display("ERROR: cannot open mixer_log.csv");
+            $finish;
+        end
+        $fdisplay(fd, "time,adc_data,dds_cos,dds_sin,i_out,q_out,exp_i_out,exp_q_out,pass"); 
+    end
+    
+    
 
 endmodule
