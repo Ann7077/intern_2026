@@ -64,6 +64,17 @@ module mixer_tb;
         $fdisplay(fd, "time,adc_data,dds_cos,dds_sin,i_out,q_out,exp_i_out,exp_q_out,pass"); 
     end
     
+    // DUT
+    mixer dut (   
+        .clk(clk),
+        .rst_n(rst_n),
+        .adc_data(adc_data),  
+        .dds_cos(dds_cos),  
+        .dds_sin(dds_sin),
+        .i_out(i_out),
+        .q_out(q_out)
+    );
+    
     
 
 endmodule
