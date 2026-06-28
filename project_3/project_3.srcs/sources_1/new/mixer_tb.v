@@ -31,8 +31,8 @@ module mixer_tb;
     reg signed [IN_W-1:0] dds_cos;
     reg signed [IN_W-1:0] dds_sin;
     
-    wire signed [OUT_W:0] i_out;
-    wire signed [OUT_W:0] q_out;
+    wire signed [OUT_W-1:0] i_out;
+    wire signed [OUT_W-1:0] q_out;
 
 
     // clock generator
@@ -49,8 +49,8 @@ module mixer_tb;
     end
     
     // expected outputs
-    reg signed [OUT_W:0] exp_i_out;
-    reg signed [OUT_W:0] exp_q_out;
+    reg signed [OUT_W-1:0] exp_i_out;
+    reg signed [OUT_W-1:0] exp_q_out;
     
     // generate csv file 
     integer fd;
