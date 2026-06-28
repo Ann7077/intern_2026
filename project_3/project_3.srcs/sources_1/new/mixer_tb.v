@@ -103,5 +103,33 @@ module mixer_tb;
             end
         end
     endtask
+    
+    // case tests
+    integer k;
+    initial begin
+        adc_data = {IN_W{1'b0}};   // initialize adc_data as 0 
+        dds_cos  = {IN_W{1'b0}};   // initialize dds_cos as 0 
+        dds_sin  = {IN_W{1'b0}};   // initialize dds_sin as 0 
+        #1;                        // wait for initialization to take effect
+        
+        @(posedge rst_n);
+        @(posedge clk);
+        
+        // specific case tests
+        check(0,0,0);                                   // test: 0 * 0 = 0, 0 * 0 = 0
+        check(1,{IN_W{1'b1}},{IN_W{1'b1}});             // test: 1 * max dds_cos, 1 * max dds_sin
+        check(0,{IN_W{1'b1}},{IN_W{1'b1}});             // test: 0 * max dds_cos, 0 * max dds_sin
+        check({IN_W{1'b1}},0,0);                        // test: max adc_data * 0, max adc_data * 0
+        check({IN_W{1'b1}},{IN_W{1'b1}},{IN_W{1'b1}});  // test: max adc_data * max dds_cos, max adc_data * dds_sin
+        
+        // random case tests * 1000
+        for (k = 0; k < 1000; k = k + 1) begin   
+            check ($random, $random, $random);  
+        end
+        
+        $display("PASS"); // if all tests passed, print PASS
+        $fclose(fd);
+        $finish;
+    end
 
 endmodule
