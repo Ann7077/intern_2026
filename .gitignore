@@ -1,5 +1,5 @@
-*.cache
-*.sim
-*.ip_user_files
-*.hw
+*.cache/
+*.sim/
+*.ip_user_files/
+*.hw/
 *.runs
