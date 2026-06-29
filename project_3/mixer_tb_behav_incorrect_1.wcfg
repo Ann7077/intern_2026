@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="mixer_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="mixer_tb" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0fs"></ZoomStartTime>
+      <ZoomEndTime time="986000001fs"></ZoomEndTime>
+      <Cursor1Time time="55000000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="175"></NameColumnWidth>
+      <ValueColumnWidth column_width="124"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="13" />
+   <wvobject fp_name="/mixer_tb/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mixer_tb/rst_n" type="logic">
+      <obj_property name="ElementShortName">rst_n</obj_property>
+      <obj_property name="ObjectShortName">rst_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mixer_tb/adc_data" type="array">
+      <obj_property name="ElementShortName">adc_data[11:0]</obj_property>
+      <obj_property name="ObjectShortName">adc_data[11:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mixer_tb/dds_cos" type="array">
+      <obj_property name="ElementShortName">dds_cos[11:0]</obj_property>
+      <obj_property name="ObjectShortName">dds_cos[11:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mixer_tb/dds_sin" type="array">
+      <obj_property name="ElementShortName">dds_sin[11:0]</obj_property>
+      <obj_property name="ObjectShortName">dds_sin[11:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mixer_tb/i_out" type="array">
+      <obj_property name="ElementShortName">i_out[23:0]</obj_property>
+      <obj_property name="ObjectShortName">i_out[23:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mixer_tb/q_out" type="array">
+      <obj_property name="ElementShortName">q_out[23:0]</obj_property>
+      <obj_property name="ObjectShortName">q_out[23:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mixer_tb/exp_i_out" type="array">
+      <obj_property name="ElementShortName">exp_i_out[23:0]</obj_property>
+      <obj_property name="ObjectShortName">exp_i_out[23:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mixer_tb/exp_q_out" type="array">
+      <obj_property name="ElementShortName">exp_q_out[23:0]</obj_property>
+      <obj_property name="ObjectShortName">exp_q_out[23:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mixer_tb/fd" type="array">
+      <obj_property name="ElementShortName">fd[31:0]</obj_property>
+      <obj_property name="ObjectShortName">fd[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mixer_tb/k" type="array">
+      <obj_property name="ElementShortName">k[31:0]</obj_property>
+      <obj_property name="ObjectShortName">k[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mixer_tb/IN_W" type="array">
+      <obj_property name="ElementShortName">IN_W[31:0]</obj_property>
+      <obj_property name="ObjectShortName">IN_W[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/mixer_tb/OUT_W" type="array">
+      <obj_property name="ElementShortName">OUT_W[31:0]</obj_property>
+      <obj_property name="ObjectShortName">OUT_W[31:0]</obj_property>
+   </wvobject>
+</wave_config>
