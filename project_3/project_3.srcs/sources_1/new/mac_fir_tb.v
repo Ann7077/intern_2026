@@ -29,11 +29,11 @@ module mac_fir_tb;
     
     reg i_clk;
     reg i_rst_n;
-    reg signed   [DATA_W-1:0]  i_data;
-    reg signed   [COEFF_W-1:0]  i_coeff;
+    reg signed   [DATA_W-1:0]     i_data;
+    reg signed   [COEFF_W-1:0]    i_coeff;
     
-    reg signed   [CAS_IN_W:0]  i_cascade_in;
+    reg signed   [CAS_IN_W-1:0]   i_cascade_in;
     wire signed  [CAS_OUT_W-1:0]  o_cascade_out;
-    
+   
     
 endmodule
