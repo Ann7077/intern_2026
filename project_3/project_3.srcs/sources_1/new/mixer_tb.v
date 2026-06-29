@@ -110,9 +110,21 @@ module mixer_tb;
     // case tests
     integer k;
     
-    real theta;
-    real pi = 3.14159;
+    //real theta;
+    //real pi = 3.14159;
     integer amp = 2000; // Amplitude scaling factor for 12-bit signed
+    
+    integer tone_amp = 1000; // 1000 + 1000 = 2000 max, staying safely within 12-bit signed 
+    
+    // phase accumulators (represent continuous time t = nT)
+    real phase_f1  = 0.0;  // Phase tracker for 20MHz desired signal
+    real phase_f2  = 0.0;  // Phase tracker for 35MHz interference signal
+    real phase_dds = 0.0;  // Phase tracker for 20MHz Local Oscillator (DDS)
+    
+    // Phase steps per clock cycle derived from: 2 * pi * (f / Fs)
+    real step_f1   = 2.0 * 3.14159 * (20.0 / 100.0);  // 20MHz target signal step: 2 * pi * (20M / 100M) = 0.4 * pi
+    real step_f2   = 2.0 * 3.14159 * (35.0 / 100.0);  // 35MHz interference step: 2 * pi * (35M / 100M) = 0.7 * pi
+    real step_dds  = 2.0 * 3.14159 * (20.0 / 100.0);  // 20MHz Local Oscillator step: 2 * pi * (20M / 100M) = 0.4 * pi
     
     initial begin
         adc_data = {IN_W{1'b0}};   // initialize adc_data as 0 
@@ -139,15 +151,21 @@ module mixer_tb;
         //check({1'b1, {(IN_W-1){1'b0}}}, {1'b1, {(IN_W-1){1'b0}}}, {1'b1, {(IN_W-1){1'b0}}});  // test: max neg adc_data * max neg dds_cos, max neg adc_data * max neg dds_sin
         
         // 
-        for (k = 0; k <= 72; k = k + 1) begin   
-            theta = (k * 5.0) * (pi / 180.0);   
+        for (k = 0; k < 200; k = k + 1) begin   
+            //theta = (k * 5.0) * (pi / 180.0);   
             // (k * 5) is angles in degrees, loop 72 times is 360 degrees. theta is convert from degrees to radians
             
             check(  // amplitude scale up to 12 bits., $rtoi is real to integer
-                amp,                       // adc_data, fixed amplitude for testing
-                $rtoi(amp * $cos(theta)),  // dds_cos = A * cos(x)
-                $rtoi(amp * $sin(theta))   // dds_sin = A * sin(x)
+                $rtoi(tone_amp * $sin(phase_f1) + tone_amp * $sin(phase_f2)),  // sum of 2 tones (20MHz + 35 MHz)
+                
+                // Local Oscillator 
+                $rtoi(amp * $cos(phase_dds)),  // 20MHz cos
+                $rtoi(amp * $sin(phase_dds))   // 20MHz sin
             );  
+            
+            phase_f1  = phase_f1  + step_f1;
+            phase_f2  = phase_f2  + step_f2;
+            phase_dds = phase_dds + step_dds;
         end       
         
         $display("PASS"); // if all tests passed, print PASS
