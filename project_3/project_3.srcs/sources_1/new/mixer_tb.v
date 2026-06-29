@@ -82,6 +82,9 @@ module mixer_tb;
         input signed [IN_W-1:0] c_dds_sin;  
         
         begin
+            @(posedge clk);  // apply inputs after the clock edge
+            #1;
+        
             adc_data <= c_adc_data;  // set DUT input adc_data as task input c_adc_data
             dds_cos  <= c_dds_cos;   // set DUT input dds_cos as task input c_dds_cos
             dds_sin  <= c_dds_sin;   // set DUT input dds_sin as task input c_dds_sin
