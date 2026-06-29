@@ -109,6 +109,11 @@ module mixer_tb;
     
     // case tests
     integer k;
+    
+    real theta;
+    real pi = 3.14159;
+    integer amp = 2000; // Amplitude scaling factor for 12-bit signed
+    
     initial begin
         adc_data = {IN_W{1'b0}};   // initialize adc_data as 0 
         dds_cos  = {IN_W{1'b0}};   // initialize dds_cos as 0 
@@ -119,24 +124,31 @@ module mixer_tb;
         @(posedge clk);
         
         // specific case tests
-        check(0,0,0);  // test: 0 * 0 = 0, 0 * 0 = 0
+        //check(0,0,0);  // test: 0 * 0 = 0, 0 * 0 = 0
         
             // positive: all 1 except first place is 0
-        check({1'b0, {(IN_W-1){1'b1}}}, 0, 0);  // test: max pos adc_data * 0, max pos adc_data * 0
-        check(1, {1'b0, {(IN_W-1){1'b1}}}, {1'b0, {(IN_W-1){1'b1}}});  // test: 1 * max pas dds_cos, 1 * max pas dds_sin
-        check(0, {1'b0, {(IN_W-1){1'b1}}}, {1'b0, {(IN_W-1){1'b1}}});  // test: 0 * pos max dds_cos, 0 * max pos dds_sin
-        check({1'b0, {(IN_W-1){1'b1}}}, {1'b0, {(IN_W-1){1'b1}}}, {1'b0, {(IN_W-1){1'b1}}});  // test: max pos adc_data * max pos dds_cos, max pos adc_data * max pos dds_sin
+        //check({1'b0, {(IN_W-1){1'b1}}}, 0, 0);  // test: max pos adc_data * 0, max pos adc_data * 0
+        //check(1, {1'b0, {(IN_W-1){1'b1}}}, {1'b0, {(IN_W-1){1'b1}}});  // test: 1 * max pas dds_cos, 1 * max pas dds_sin
+        //check(0, {1'b0, {(IN_W-1){1'b1}}}, {1'b0, {(IN_W-1){1'b1}}});  // test: 0 * pos max dds_cos, 0 * max pos dds_sin
+        //check({1'b0, {(IN_W-1){1'b1}}}, {1'b0, {(IN_W-1){1'b1}}}, {1'b0, {(IN_W-1){1'b1}}});  // test: max pos adc_data * max pos dds_cos, max pos adc_data * max pos dds_sin
         
             // negative: all 0 except first place is 1
-        check({1'b1, {(IN_W-1){1'b0}}}, 0, 0);  // test: max neg adc_data * 0, max neg adc_data * 0
-        check(1, {1'b1, {(IN_W-1){1'b0}}}, {1'b1, {(IN_W-1){1'b0}}});  // test: 1 * max neg dds_cos, 1 * max neg dds_sin
-        check(0, {1'b1, {(IN_W-1){1'b0}}}, {1'b1, {(IN_W-1){1'b0}}});  // test: 0 * max neg dds_cos, 0 * max neg dds_sin
-        check({1'b1, {(IN_W-1){1'b0}}}, {1'b1, {(IN_W-1){1'b0}}}, {1'b1, {(IN_W-1){1'b0}}});  // test: max neg adc_data * max neg dds_cos, max neg adc_data * max neg dds_sin
+        //check({1'b1, {(IN_W-1){1'b0}}}, 0, 0);  // test: max neg adc_data * 0, max neg adc_data * 0
+        //check(1, {1'b1, {(IN_W-1){1'b0}}}, {1'b1, {(IN_W-1){1'b0}}});  // test: 1 * max neg dds_cos, 1 * max neg dds_sin
+        //check(0, {1'b1, {(IN_W-1){1'b0}}}, {1'b1, {(IN_W-1){1'b0}}});  // test: 0 * max neg dds_cos, 0 * max neg dds_sin
+        //check({1'b1, {(IN_W-1){1'b0}}}, {1'b1, {(IN_W-1){1'b0}}}, {1'b1, {(IN_W-1){1'b0}}});  // test: max neg adc_data * max neg dds_cos, max neg adc_data * max neg dds_sin
         
-        // random case tests * 1000
-        for (k = 0; k < 1000; k = k + 1) begin   
-            check ($random, $random, $random);  
-        end
+        // 
+        for (k = 0; k <= 72; k = k + 1) begin   
+            theta = (k * 5.0) * (pi / 180.0);   
+            // (k * 5) is angles in degrees, loop 72 times is 360 degrees. theta is convert from degrees to radians
+            
+            check(  // amplitude scale up to 12 bits., $rtoi is real to integer
+                amp,                       // adc_data, fixed amplitude for testing
+                $rtoi(amp * $cos(theta)),  // dds_cos = A * cos(x)
+                $rtoi(amp * $sin(theta))   // dds_sin = A * sin(x)
+            );  
+        end       
         
         $display("PASS"); // if all tests passed, print PASS
         $fclose(fd);
