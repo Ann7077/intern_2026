@@ -29,7 +29,7 @@ module fir_filter #(
     input i_clk,
     input i_rst_n,
     input signed [DATA_W-1:0] i_data,
-    input signed [COEFF_W-1:0] i_coeffs[TAPS], // Coefficients passed from testbench
+    input signed [COEFF_W-1:0] i_coeffs [0:TAPS-1], // Clean 2D array port
     output reg signed [CAS_W-1:0] o_data
 );
 
@@ -75,7 +75,7 @@ module fir_filter #(
     generate
         for (i = 0; i < TAPS; i = i + 1) begin : mac_loop
             // Extract the specific coefficient from the flattened input vector
-            wire signed [COEFF_W-1:0] current_coeff = i_coeffs[i*COEFF_W +: COEFF_W];
+            wire signed [COEFF_W-1:0] current_coeff = i_coeffs[i];
             
             // Determine the data input for this specific tap
             wire signed [DATA_W-1:0] current_data = (i == 0) ? i_data : x[i-1];
