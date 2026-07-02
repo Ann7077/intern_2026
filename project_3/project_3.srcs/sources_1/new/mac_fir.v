@@ -22,10 +22,10 @@
 
 module mac_fir #(
 
-    parameter DATA_W = 12,
-    parameter COEFF_W = 12,
-    parameter CAS_IN_W = 32,
-    parameter CAS_OUT_W = 32
+    parameter DATA_W = 12,  // 12
+    parameter COEFF_W = 12,  // 12
+    parameter CAS_IN_W = 32,  // 32
+    parameter CAS_OUT_W = 32  // 32
     
 )(
     input i_clk,
@@ -39,7 +39,7 @@ module mac_fir #(
 );
 
     // Stage 1: Full-Precision Multiplication
-    reg signed [23:0] r_mult_res;              // 12-bit * 12-bit = 24-bit signed product register
+    reg signed [DATA_W+COEFF_W-1:0] r_mult_res;              // 12-bit * 12-bit = 24-bit signed product register
     reg signed [CAS_IN_W-1:0] r_cascade_in_d1;         // Delay version of i_cascade_in bu 1 cycle
 
     always @(posedge i_clk or negedge i_rst_n) begin

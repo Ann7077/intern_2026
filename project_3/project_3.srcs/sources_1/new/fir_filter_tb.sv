@@ -23,14 +23,17 @@
 module fir_filter_tb;
 
     // Parameters
-    parameter DATA_W  = 12;
-    parameter COEFF_W = 12;
-    parameter CAS_W   = 32;
+    parameter DATA_W  = 12;  // 12
+    parameter COEFF_W = 12;  // 12
+    parameter CAS_W   = 32;  // 32
+    parameter TAPS = 5;
 
     // Inputs
     reg i_clk;
     reg i_rst_n;
     reg signed [DATA_W-1:0] i_data;
+    
+    reg signed [COEFF_W-1:0] tb_coeffs [0:TAPS-1];
 
     // Outputs
     wire signed [CAS_W-1:0]  o_data;
@@ -39,11 +42,13 @@ module fir_filter_tb;
     fir_filter #(
         .DATA_W(DATA_W),
         .COEFF_W(COEFF_W),
-        .CAS_W(CAS_W)
+        .CAS_W(CAS_W),
+        .TAPS(TAPS)
     ) uut (
         .i_clk(i_clk),
         .i_rst_n(i_rst_n),
         .i_data(i_data),
+        .i_coeffs(tb_coeffs),
         .o_data(o_data)
     );
 
@@ -58,6 +63,13 @@ module fir_filter_tb;
         i_clk   = 1'b0;
         i_rst_n = 1'b0;
         i_data  = {DATA_W{1'b0}};
+        
+        // coefficients
+        tb_coeffs[0] = 12'sd2;  
+        tb_coeffs[1] = 12'sd4;  
+        tb_coeffs[2] = 12'sd6;  
+        tb_coeffs[3] = 12'sd4;  
+        tb_coeffs[4] = 12'sd2;
 
         #100;
         
