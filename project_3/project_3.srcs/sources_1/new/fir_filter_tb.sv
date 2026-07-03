@@ -56,6 +56,12 @@ module fir_filter_tb;
     always begin
         #5 i_clk = ~i_clk; // 100MHz clock
     end
+    
+    real pi = 3.14159265358979323846;
+    real frequency = 5000000;         // Desired Sine Wave Frequency: 5 MHz
+    real sampling_rate = 100000000;   // Your Clock Rate: 100 MHz (10ns period)
+    real amplitude = 2047.0;          // Max amplitude for 12-bit signed integer (2^11 - 1)
+    integer step = 0;
 
     // Stimulus Block
     initial begin
@@ -86,6 +92,17 @@ module fir_filter_tb;
         
         // Finish simulation
         $finish;
+    end
+    
+    always @(posedge i_clk) begin
+        if (!i_rst_n) begin
+            i_data <= {DATA_W{1'b0}};
+            step   <= 0;
+        end else begin
+            // Amplitude * sin(2 * pi * f * t)
+            i_data <= $rtoi(amplitude * $sin(2.0 * pi * frequency * step / sampling_rate));
+            step   <= step + 1;
+        end
     end
 
 endmodule
