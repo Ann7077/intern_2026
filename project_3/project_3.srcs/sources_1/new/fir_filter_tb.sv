@@ -57,9 +57,9 @@ module fir_filter_tb;
         #5 i_clk = ~i_clk; // 100MHz clock
     end
     
-    real pi = 3.14159265358979323846;
-    real frequency = 5000000;         // Desired Sine Wave Frequency: 5 MHz
-    real sampling_rate = 100000000;   // Your Clock Rate: 100 MHz (10ns period)
+    real pi = 3.14159;
+    real frequency = 25e6;         // Desired Sine Wave Frequency: 5 MHz
+    real sampling_rate = 100e6;   // Your Clock Rate: 100 MHz (10ns period)
     real amplitude = 2047.0;          // Max amplitude for 12-bit signed integer (2^11 - 1)
     integer step = 0;
 
@@ -88,7 +88,7 @@ module fir_filter_tb;
         i_data = 12'sd10;
         
         // Run simulation long enough to let the data propagate through all 32 stages
-        #1000;
+        #3000;
         
         // Finish simulation
         $finish;

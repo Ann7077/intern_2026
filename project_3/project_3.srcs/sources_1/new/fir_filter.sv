@@ -24,7 +24,7 @@ module fir_filter #(
     parameter DATA_W  = 12,  // 12
     parameter COEFF_W = 12,  // 12
     parameter CAS_W   = 32,  // 32
-    parameter TAPS = 5  // 32
+    parameter TAPS = 5       // 32
 )(
     input i_clk,
     input i_rst_n,
@@ -35,20 +35,8 @@ module fir_filter #(
 
  
     // 32-Tap Coefficients 
-    /*
-    parameter signed [COEFF_W-1:0] H0  = 12'd1,  H1  = 12'd2,  H2  = 12'd3,  H3  = 12'd4,
-                                    H4  = 12'd5,  H5  = 12'd6,  H6  = 12'd7,  H7  = 12'd8,
-                                    H8  = 12'd9,  H9  = 12'd10, H10 = 12'd11, H11 = 12'd12,
-                                    H12 = 12'd13, H13 = 12'd14, H14 = 12'd15, H15 = 12'd16,
-                                    H16 = 12'd16, H17 = 12'd15, H18 = 12'd14, H19 = 12'd13,
-                                    H20 = 12'd12, H21 = 12'd11, H22 = 12'd10, H23 = 12'd9,
-                                    H24 = 12'd8,  H25 = 12'd7,  H26 = 12'd6,  H27 = 12'd5,
-                                    H28 = 12'd4,  H29 = 12'd3,  H30 = 12'd2,  H31 = 12'd1;
     
-    write coefficients in testbench
-    */
-
-
+    
     // Delay line for 32-tap (x0 to x30, x31 is direct input)
     reg signed [DATA_W-1:0] x [0:TAPS-2];
     integer k;
