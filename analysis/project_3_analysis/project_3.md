@@ -127,7 +127,7 @@ module fir_filter_tb;
         #5 i_clk = ~i_clk; // 100MHz clock
     end
     
-    real pi = 3.14159265358979323846;
+    real pi = 3.14159;
     real frequency = 5000000;         // Desired Sine Wave Frequency: 5 MHz
     real sampling_rate = 100000000;   // Your Clock Rate: 100 MHz (10ns period)
     real amplitude = 2047.0;          // Max amplitude for 12-bit signed integer (2^11 - 1)
@@ -179,7 +179,75 @@ endmodule
 ```
 
 ## Graph for sine input
-![fir_filter_sin_input](vx_images/fir_filter_sin_input.png) 
+Frequency = 50Hz
+![fir_filter_sin_input](vx_images/fir_filter_sin_input_f50.png) 
+
+Frequency = 50KHz
+![fir_filter_sin_input](vx_images/fir_filter_sin_input_f50000.png) 
+
+Frequency = 500kHz
+![fir_filter_sin_input](vx_images/fir_filter_sin_input_f500K.png)
+
+Frequency = 1MHz
+![fir_filter_sin_input](vx_images/fir_filter_sin_input_f1M.png)
+
+Frequency = 2MHz
+![fir_filter_sin_input](vx_images/fir_filter_sin_input_f2M.png)
+
+Frequency = 3MHz
+![fir_filter_sin_input](vx_images/fir_filter_sin_input_f3M.png)  
+
+Frequency = 4MHz
+![fir_filter_sin_input](vx_images/fir_filter_sin_input_f4M.png)  
+
+Frequency = 5MHz
+![fir_filter_sin_input](vx_images/fir_filter_sin_input_f5M.png) 
+
+Frequency = 10MHz
+![fir_filter_sin_input](vx_images/fir_filter_sin_input_f10M.png)
+
+Frequency = 15MHz
+![fir_filter_sin_input](vx_images/fir_filter_sin_input_f15M.png)
+
+Frequency = 20MHz
+![fir_filter_sin_input](vx_images/fir_filter_sin_input_f20M.png)
+
+Frequency = 25MHz
+![fir_filter_sin_input](vx_images/fir_filter_sin_input_f25M.png) 
+
+
+| Freq | Amplitude|
+|--|--|
+| 500k  | 36594 |
+|1M | 35968|
+2M | 33400
+3M | 29526
+4M | 24290
+5M | 19372
+6M | 14000
+7M | 9152
+8M | 5096
+9M | 2296
+10M| 566
+11M| 4
+12M| 292
+13M| 1158
+14M| 2310
+15M| 3332
+16M| 3956
+17M| 3934
+18M| 3588
+19M| 2634
+20M| 1486
+21M| 520
+22M| 22
+23M| 282
+24M| 1234
+25M| 4092
+
 
 ## Graph for cosine input
-![fir_filter_cos_input](vx_images/fir_filter_cos_input.png)
+
+Frequency = 5MHz
+![fir_filter_cos_input_f5000000](vx_images/fir_filter_cos_input_f5000000.png)
+
