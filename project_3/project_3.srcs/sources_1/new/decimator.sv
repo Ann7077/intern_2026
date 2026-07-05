@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module fir_decimator # (
+module decimator # (
     parameter DATA_W     = 12,  // 12
     parameter COEFF_W    = 12,  // 12
     parameter CAS_W      = 32,  // 32
