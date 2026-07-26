@@ -36,6 +36,8 @@ module decimator_b # (
     output reg                       o_data_valid  
 );
 
+    localparam TAPS_PER_BRANCH = (TAPS + DEC_FACTOR - 1) / DEC_FACTOR;
+
     // 1. Fast Domain: Delay line to feed the phase switches
     reg signed [DATA_W-1:0] fast_reg [0:DEC_FACTOR-1];
 
@@ -47,46 +49,71 @@ module decimator_b # (
         end else begin
             fast_reg[0] <= i_data;
             for (int i = 1; i < DEC_FACTOR; i = i + 1) begin
-                fast_reg[i] <= fast_reg[i-1]; // Generates x[n], x[n-1], x[n-2], etc
+                fast_reg[i] <= fast_reg[i-1];
             end
         end
     end
 
-    // 2. Downsampling Counter
-    reg [3:0] sample_cnt;
-    
-    // 3. Slow Domain: Polyphase Storage
-    reg signed [DATA_W-1:0] poly_reg [0:TAPS-1];
-    reg signed [CAS_W-1:0]  acc;
+    // 2. Sample Counter for Downsampling
+    // Downsampling countdown timer. Slow down the data rate by a factor of N (DEC_FACTOR)
+    reg [$clog2(DEC_FACTOR)-1:0] sample_cnt;  // $clog2 is "ceiling of log base 2"
 
+    // 3. Symmetric 2D Matrix Storage for Balanced Polyphase Processing
+    reg signed [DATA_W-1:0]  poly_reg_2d    [0:DEC_FACTOR-1][0:TAPS_PER_BRANCH-1];
+    reg signed [COEFF_W-1:0] poly_coeffs_2d [0:DEC_FACTOR-1][0:TAPS_PER_BRANCH-1];
+    
+    reg signed [CAS_W-1:0]   acc;
+
+    // 4. Generates the virtual zeros (ex: h7=0, h8=0) automatically if TAPS isn't a multiple of DEC_FACTOR
+    // poly_coeffs_2d [b][k]: b is branches, from 0 to DEC_FACTOR - 1; k is taps, from 0 to TAPS_PER_BRANCH - 1
+    // flat_idx = b + (k * DEC_FACTOR) is what figures out what's the coefficient subscript and if zero need to added
+    always_comb begin
+        for (int b = 0; b < DEC_FACTOR; b = b + 1) begin
+            for (int k = 0; k < TAPS_PER_BRANCH; k = k + 1) begin
+                automatic int flat_idx = b + (k * DEC_FACTOR);
+                
+                if (flat_idx < TAPS) begin
+                    poly_coeffs_2d[b][k] = i_coeffs[flat_idx];
+                end else begin
+                    poly_coeffs_2d[b][k] = {COEFF_W{1'b0}}; // zero padding
+                end
+            end
+        end
+    end
+
+    // 5. Downsampling, Shifting, and Accumulation 
     always @(posedge i_clk or negedge i_rst_n) begin
         if (!i_rst_n) begin
             sample_cnt       <= 0;
             o_decimated_data <= 0;
             o_data_valid     <= 1'b0;
-            for (int i = 0; i < TAPS; i = i + 1) begin
-                poly_reg[i]  <= 0;
+            
+            for (int b = 0; b < DEC_FACTOR; b = b + 1) begin
+                for (int k = 0; k < TAPS_PER_BRANCH; k = k + 1) begin
+                    poly_reg_2d[b][k] <= 0;
+                end
             end
         end else begin
             if (sample_cnt == (DEC_FACTOR - 1)) begin
                 sample_cnt   <= 0;
                 o_data_valid <= 1'b1;
                 
-                // downsample and shift (inside branches simultaneously)
-                for (int j = 0; j < TAPS; j = j + 1) begin
-                    if (j < DEC_FACTOR) begin   /// 
-                        // branch inputs capture the fast domain phases
-                        poly_reg[j] <= fast_reg[j];
-                    end else begin
-                        // internal branch registers shift down by DEC_FACTOR steps
-                        poly_reg[j] <= poly_reg[j - DEC_FACTOR];
+                // The Symmetrical 2D Shift Register Line
+                for (int b = 0; b < DEC_FACTOR; b = b + 1) begin
+                    // Shift the older values down the specific branch delay line
+                    for (int k = TAPS_PER_BRANCH - 1; k > 0; k = k - 1) begin
+                        poly_reg_2d[b][k] <= poly_reg_2d[b][k-1];
                     end
+                    // Load the newly caught fast-domain phase sample into the head of the branch
+                    poly_reg_2d[b][0] <= fast_reg[b];
                 end
 
-                // MAC across all branches
+                // MAC
                 acc = 0;
-                for (int j = 0; j < TAPS; j = j + 1) begin
-                    acc = acc + (poly_reg[j] * i_coeffs[j]);
+                for (int b = 0; b < DEC_FACTOR; b = b + 1) begin
+                    for (int k = 0; k < TAPS_PER_BRANCH; k = k + 1) begin
+                        acc = acc + (poly_reg_2d[b][k] * poly_coeffs_2d[b][k]);
+                    end
                 end
                 o_decimated_data <= acc;
 
