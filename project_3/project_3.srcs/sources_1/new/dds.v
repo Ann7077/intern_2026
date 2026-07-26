@@ -43,5 +43,13 @@ module dds #(
             phase_acc <= phase_acc + ftw;
         end
     end
+    
+    // 2. LUT Addressing & Quadrature Phase Offset
+    wire [ACC_W-1:0] phase_sin_total = phase_acc + phase_offset;
+    wire [ACC_W-1:0] phase_cos_total = phase_acc + phase_offset + (1'b1 << (ACC_W - 2));
+
+    // Extract Top L-bits for ROM Addressing
+    wire [LUT_W-1:0] lut_addr_sin = phase_sin_total[ACC_W-1 -: LUT_W];
+    wire [LUT_W-1:0] lut_addr_cos = phase_cos_total[ACC_W-1 -: LUT_W];
 
 endmodule
