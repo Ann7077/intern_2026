@@ -3,88 +3,71 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="decimator_tb_behav.wdb" id="1">
+      <db_ref path="dds_tb_behav.wdb" id="1">
          <top_modules>
-            <top_module name="decimator_tb" />
+            <top_module name="dds_tb" />
             <top_module name="glbl" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="1186735545fs"></ZoomEndTime>
-      <Cursor1Time time="438504000fs"></Cursor1Time>
+      <ZoomEndTime time="1050000000fs"></ZoomEndTime>
+      <Cursor1Time time="265000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="167"></NameColumnWidth>
+      <NameColumnWidth column_width="152"></NameColumnWidth>
       <ValueColumnWidth column_width="72"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="16" />
-   <wvobject fp_name="/decimator_tb/i_clk" type="logic">
-      <obj_property name="ElementShortName">i_clk</obj_property>
-      <obj_property name="ObjectShortName">i_clk</obj_property>
+   <WVObjectSize size="11" />
+   <wvobject fp_name="/dds_tb/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject fp_name="/decimator_tb/i_rst_n" type="logic">
-      <obj_property name="ElementShortName">i_rst_n</obj_property>
-      <obj_property name="ObjectShortName">i_rst_n</obj_property>
+   <wvobject fp_name="/dds_tb/rst_n" type="logic">
+      <obj_property name="ElementShortName">rst_n</obj_property>
+      <obj_property name="ObjectShortName">rst_n</obj_property>
    </wvobject>
-   <wvobject fp_name="/decimator_tb/i_data" type="array">
-      <obj_property name="ElementShortName">i_data[11:0]</obj_property>
-      <obj_property name="ObjectShortName">i_data[11:0]</obj_property>
+   <wvobject fp_name="/dds_tb/ftw" type="array">
+      <obj_property name="ElementShortName">ftw[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ftw[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/decimator_tb/tb_coeffs" type="array">
-      <obj_property name="ElementShortName">tb_coeffs[0:6][11:0]</obj_property>
-      <obj_property name="ObjectShortName">tb_coeffs[0:6][11:0]</obj_property>
+   <wvobject fp_name="/dds_tb/phase_offset" type="array">
+      <obj_property name="ElementShortName">phase_offset[31:0]</obj_property>
+      <obj_property name="ObjectShortName">phase_offset[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/decimator_tb/o_decimated_data" type="array">
-      <obj_property name="ElementShortName">o_decimated_data[31:0]</obj_property>
-      <obj_property name="ObjectShortName">o_decimated_data[31:0]</obj_property>
+   <wvobject fp_name="/dds_tb/dds_sin" type="array">
+      <obj_property name="ElementShortName">dds_sin[11:0]</obj_property>
+      <obj_property name="ObjectShortName">dds_sin[11:0]</obj_property>
       <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
       <obj_property name="CellHeight">100</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/decimator_tb/o_data_valid" type="logic">
-      <obj_property name="ElementShortName">o_data_valid</obj_property>
-      <obj_property name="ObjectShortName">o_data_valid</obj_property>
+   <wvobject fp_name="/dds_tb/dds_cos" type="array">
+      <obj_property name="ElementShortName">dds_cos[11:0]</obj_property>
+      <obj_property name="ObjectShortName">dds_cos[11:0]</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/decimator_tb/pi" type="other">
-      <obj_property name="ElementShortName">pi</obj_property>
-      <obj_property name="ObjectShortName">pi</obj_property>
+   <wvobject fp_name="/dds_tb/file_sin" type="array">
+      <obj_property name="ElementShortName">file_sin[31:0]</obj_property>
+      <obj_property name="ObjectShortName">file_sin[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/decimator_tb/frequency" type="other">
-      <obj_property name="ElementShortName">frequency</obj_property>
-      <obj_property name="ObjectShortName">frequency</obj_property>
+   <wvobject fp_name="/dds_tb/file_cos" type="array">
+      <obj_property name="ElementShortName">file_cos[31:0]</obj_property>
+      <obj_property name="ObjectShortName">file_cos[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/decimator_tb/sampling_rate" type="other">
-      <obj_property name="ElementShortName">sampling_rate</obj_property>
-      <obj_property name="ObjectShortName">sampling_rate</obj_property>
+   <wvobject fp_name="/dds_tb/ACC_W" type="array">
+      <obj_property name="ElementShortName">ACC_W[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ACC_W[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/decimator_tb/amplitude" type="other">
-      <obj_property name="ElementShortName">amplitude</obj_property>
-      <obj_property name="ObjectShortName">amplitude</obj_property>
+   <wvobject fp_name="/dds_tb/LUT_W" type="array">
+      <obj_property name="ElementShortName">LUT_W[31:0]</obj_property>
+      <obj_property name="ObjectShortName">LUT_W[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/decimator_tb/step" type="array">
-      <obj_property name="ElementShortName">step[31:0]</obj_property>
-      <obj_property name="ObjectShortName">step[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/decimator_tb/DATA_W" type="array">
-      <obj_property name="ElementShortName">DATA_W[31:0]</obj_property>
-      <obj_property name="ObjectShortName">DATA_W[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/decimator_tb/COEFF_W" type="array">
-      <obj_property name="ElementShortName">COEFF_W[31:0]</obj_property>
-      <obj_property name="ObjectShortName">COEFF_W[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/decimator_tb/CAS_W" type="array">
-      <obj_property name="ElementShortName">CAS_W[31:0]</obj_property>
-      <obj_property name="ObjectShortName">CAS_W[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/decimator_tb/TAPS" type="array">
-      <obj_property name="ElementShortName">TAPS[31:0]</obj_property>
-      <obj_property name="ObjectShortName">TAPS[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/decimator_tb/DEC_FACTOR" type="array">
-      <obj_property name="ElementShortName">DEC_FACTOR[31:0]</obj_property>
-      <obj_property name="ObjectShortName">DEC_FACTOR[31:0]</obj_property>
+   <wvobject fp_name="/dds_tb/OUT_W" type="array">
+      <obj_property name="ElementShortName">OUT_W[31:0]</obj_property>
+      <obj_property name="ObjectShortName">OUT_W[31:0]</obj_property>
    </wvobject>
 </wave_config>
