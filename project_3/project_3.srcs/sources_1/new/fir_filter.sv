@@ -24,7 +24,7 @@ module fir_filter #(
     parameter DATA_W  = 12,  // 12
     parameter COEFF_W = 12,  // 12
     parameter CAS_W   = 32,  // 32
-    parameter TAPS = 5       // 32
+    parameter TAPS = 32      // 32
 )(
     input i_clk,
     input i_rst_n,
