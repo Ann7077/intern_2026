@@ -30,7 +30,7 @@ module fir_filter #(
     input i_rst_n,
     input signed [DATA_W-1:0] i_data,
     input signed [COEFF_W-1:0] i_coeffs [0:TAPS-1], // Clean 2D array port
-    output reg signed [CAS_W-1:0] o_data
+    output reg signed [CAS_W-1:0] o_data 
 );
 
  
@@ -91,8 +91,10 @@ module fir_filter #(
                 );
             end
         end
+        
     endgenerate
 
+    
     // Final output registration
     always @(posedge i_clk or negedge i_rst_n) begin
         if (!i_rst_n)
@@ -100,5 +102,6 @@ module fir_filter #(
         else
             o_data <= m[0]; // Final accumulated results
     end
+   
 
 endmodule

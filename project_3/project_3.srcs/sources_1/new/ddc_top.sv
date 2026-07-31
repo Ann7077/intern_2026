@@ -24,7 +24,7 @@ module ddc_top #(
     parameter DDS_W      = 12,              // Bit width of DDS sine/cosine outputs
     parameter MIX_W      = 24,              // Mixer output bit width (INPUT_W + DDS_W)
     parameter COEFF_W    = 12,              // FIR coefficient bit width
-    parameter OUT_W      = 32,              // Final output bit width
+    parameter FIR_OUT_W  = 32,              // Final output bit width// FIR output bit width
     parameter TAPS       = 32,              // Number of FIR taps
     parameter DEC_FACTOR = 10,              // Downsampling ratio (100MHz -> 10MHz)
     parameter PHASE_ACC_W = 32,             // DDS Phase accumulator bit width 
@@ -41,9 +41,9 @@ module ddc_top #(
     input  wire signed [COEFF_W-1:0] i_coeffs [0:TAPS-1],
 
     // Baseband IQ Outputs (10 MHz rate)
-    output wire signed [OUT_W-1:0]   o_i_data,
-    output wire signed [OUT_W-1:0]   o_q_data,
-    output wire                      o_data_valid
+    output wire signed [FIR_OUT_W-1:0]   o_i_data,
+    output wire signed [FIR_OUT_W-1:0]   o_q_data,
+    output wire                          o_data_valid
 );
 
     // 1. DDS / NCO Local Oscillator (20 MHz Output)
@@ -81,14 +81,42 @@ module ddc_top #(
         .i_out    (i_mix),
         .q_out    (q_mix)
     );
+    
+    // 3. FIR Filters
+    wire signed [FIR_OUT_W-1:0] i_fir;
+    wire signed [FIR_OUT_W-1:0] q_fir;
 
-    // 3. Polyphase Decimator & FIR Filter - I Branch
-    wire valid_i;
+    fir_filter #(
+        .DATA_W  (MIX_W),
+        .COEFF_W (COEFF_W),
+        .CAS_W   (FIR_OUT_W),
+        .TAPS    (TAPS)
+    ) u_fir_i (
+        .i_clk    (clk),
+        .i_rst_n  (rst_n),
+        .i_data   (i_mix),
+        .i_coeffs (i_coeffs),
+        .o_data   (i_fir)
+    );
 
+    fir_filter #(
+        .DATA_W  (MIX_W),
+        .COEFF_W (COEFF_W),
+        .CAS_W   (FIR_OUT_W),
+        .TAPS    (TAPS)
+    ) u_fir_q (
+        .i_clk    (clk),
+        .i_rst_n  (rst_n),
+        .i_data   (q_mix),
+        .i_coeffs (i_coeffs),
+        .o_data   (q_fir)
+    );
+
+    // 4. Polyphase Decimator & FIR Filter - I Branch
     decimator_b #(
         .DATA_W     (MIX_W),
         .COEFF_W    (COEFF_W),
-        .CAS_W      (OUT_W),
+        .CAS_W      (FIR_OUT_W),
         .TAPS       (TAPS),
         .DEC_FACTOR (DEC_FACTOR)
     ) u_decimator_i (
@@ -97,14 +125,14 @@ module ddc_top #(
         .i_data           (i_mix),
         .i_coeffs         (i_coeffs),
         .o_decimated_data (o_i_data),
-        .o_data_valid     (valid_i)
+        .o_data_valid     (o_data_valid)
     );
 
-    // 4. Polyphase Decimator & FIR Filter - Q Branch
+    // 5. Polyphase Decimator & FIR Filter - Q Branch
     decimator_b #(
         .DATA_W     (MIX_W),
         .COEFF_W    (COEFF_W),
-        .CAS_W      (OUT_W),
+        .CAS_W      (FIR_OUT_W),
         .TAPS       (TAPS),
         .DEC_FACTOR (DEC_FACTOR)
     ) u_decimator_q (
@@ -115,7 +143,5 @@ module ddc_top #(
         .o_decimated_data (o_q_data),
         .o_data_valid     ( ) 
     );
-
-    assign o_data_valid = valid_i;
 
 endmodule

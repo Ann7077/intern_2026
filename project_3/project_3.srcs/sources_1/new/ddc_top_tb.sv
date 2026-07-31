@@ -29,13 +29,15 @@ module ddc_top_tb;
     localparam DDS_W       = 12;
     localparam MIX_W       = 24;
     localparam COEFF_W     = 12;
-    localparam OUT_W       = 32;
+    localparam FIR_OUT_W   = 32;
     localparam TAPS        = 32;
     localparam DEC_FACTOR  = 10;
     localparam PHASE_ACC_W = 32;
 
-    localparam real F_TARGET = 20_000_000.0; // 20 MHz carrier
+    localparam real F_TARGET = 19_000_000.0; // 20 MHz carrier
     localparam real F_INTERF = 35_000_000.0; // 35 MHz interference
+    localparam real F_SAMP   = 100_000_000.0; // 100 MHz Sampling rate
+    localparam real PI       = 3.1415926535;
 
 
     // Testbench Signals
@@ -44,15 +46,17 @@ module ddc_top_tb;
     logic signed [INPUT_W-1:0] i_if_signal;
     logic signed [COEFF_W-1:0] i_coeffs [0:TAPS-1];
 
-    wire signed  [OUT_W-1:0]   o_i_data;
-    wire signed  [OUT_W-1:0]   o_q_data;
-    wire                       o_data_valid;
+    wire signed  [FIR_OUT_W-1:0]   o_i_data;
+    wire signed  [FIR_OUT_W-1:0]   o_q_data;
+    wire                           o_data_valid;
+    
+    // Signal generation math variables
+    real time_ns;
+    real sig_target, sig_interf, sig_combined;
 
-    // Clock Generation (100 MHz)
-    initial begin
-        clk = 0;
-        forever #(CLK_PERIOD / 2.0) clk = ~clk;
-    end
+    // File I/O for Python FFT Analysis
+    integer file_out;
+
 
     // DUT Instantiation
     ddc_top #(
@@ -60,12 +64,12 @@ module ddc_top_tb;
         .DDS_W      (DDS_W),
         .MIX_W      (MIX_W),
         .COEFF_W    (COEFF_W),
-        .OUT_W      (OUT_W),
+        .FIR_OUT_W  (FIR_OUT_W),
         .TAPS       (TAPS),
         .DEC_FACTOR (DEC_FACTOR),
         .PHASE_ACC_W(PHASE_ACC_W),
         .F_SAMP     (CLK_FREQ),
-        .F_CARR     (F_TARGET)
+        .F_CARR     ( )// F_TARGET
     ) uut (
         .clk          (clk),
         .rst_n        (rst_n),
@@ -75,6 +79,12 @@ module ddc_top_tb;
         .o_q_data     (o_q_data),
         .o_data_valid (o_data_valid)
     );
+    
+    // Clock Generation (100 MHz)
+    initial begin
+        clk = 0;
+        forever #(CLK_PERIOD / 2.0) clk = ~clk;
+    end
 
     // Ideal Symmetric Lowpass FIR Coefficients (32 Taps, Q1.11 format)
     initial begin
@@ -89,50 +99,40 @@ module ddc_top_tb;
     end
 
     // Signal Generation: 20 MHz Signal + 35 MHz Interference
-    real time_ns;
-    real target_val;
-    real interf_val;
-    real total_signal;
-    localparam real PI = 3.1415926535;
-
-    always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            i_if_signal <= '0;
-        end else begin
-            time_ns      = $realtime / 1.0e9;
-            // Scale components to fit signed 12-bit dynamic range (-2048 to +2047)
-            target_val   = 1000.0 * $cos(2.0 * PI * F_TARGET * time_ns);
-            interf_val   = 0; //800.0  * $cos(2.0 * PI * F_INTERF * time_ns);
-            total_signal = target_val + interf_val;
-
-            i_if_signal  <= $rtoi(total_signal);
-        end
-    end
-
-    integer file_out;
-
     initial begin
+        // Reset sequence
         rst_n       = 0;
         i_if_signal = 0;
+        #(CLK_PERIOD * 10);
+        rst_n       = 1;
 
+        // Open output file to dump IQ data for Python model verification
         file_out = $fopen("ddc_iq_output.txt", "w");
-        if (!file_out) begin
-            $display("[ERROR] Failed to open ddc_iq_output.txt for writing.");
+        if (file_out == 0) begin
+            $display("ERROR: Failed to open output file ddc_iq_output.txt!");
             $finish;
         end
 
-        $display("=== Starting DDC System Testbench ===");
-        #(CLK_PERIOD * 10);
-        rst_n = 1;
-        $display("[INFO] System Released from Reset.");
+        // Run simulation for 2000 clock cycles (20 microseconds)
+        repeat (2000) @(posedge clk) begin
+            time_ns = $time * 1.0e-9;
+            
+            // Generate combined cosine waves: Target 20MHz + Interference 35MHz
+            sig_target   = 1000.0 * $cos(2.0 * PI * F_TARGET * time_ns);
+            sig_interf   = 0; // 800.0 * $cos(2.0 * PI * F_INTERF * time_ns);
+            sig_combined = sig_target + sig_interf;
 
-        #(20_000);
+            // Quantize to 12-bit signed
+            i_if_signal  <= $rtoi(sig_combined);
+        end
 
-        $display("=== Simulation Finished Successfully ===");
         $fclose(file_out);
+        $display("SUCCESS: Simulation finished. Decimated IQ data exported to ddc_iq_output.txt");
         $finish;
     end
 
+
+    // Data Logging when valid output is ready (at 10 MHz sample rate)
     always @(posedge clk) begin
         if (rst_n && o_data_valid) begin
             $fdisplay(file_out, "%d %d", o_i_data, o_q_data);

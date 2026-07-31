@@ -58,7 +58,7 @@ module fir_filter_tb;
     end
     
     real pi = 3.14159;
-    real frequency = 25e6;         // Desired Sine Wave Frequency: 5 MHz
+    real frequency = 1e6;         // Desired Sine Wave Frequency: 5 MHz
     real sampling_rate = 100e6;   // Your Clock Rate: 100 MHz (10ns period)
     real amplitude = 2047.0;          // Max amplitude for 12-bit signed integer (2^11 - 1)
     integer step = 0;
