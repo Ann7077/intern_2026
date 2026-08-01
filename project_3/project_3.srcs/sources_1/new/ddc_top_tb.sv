@@ -133,10 +133,12 @@ module ddc_top_tb;
 
 
     // Data Logging when valid output is ready (at 10 MHz sample rate)
+    /*
     always @(posedge clk) begin
         if (rst_n && o_data_valid) begin
             $fdisplay(file_out, "%d %d", o_i_data, o_q_data);
         end
     end
+    */
 
 endmodule

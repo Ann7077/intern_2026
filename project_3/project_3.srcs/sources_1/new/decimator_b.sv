@@ -84,7 +84,7 @@ module decimator_b # (
     // 5. Downsampling, Shifting, and Accumulation 
     always @(posedge i_clk or negedge i_rst_n) begin
         if (!i_rst_n) begin
-            sample_cnt       <= 0;
+            sample_cnt       <= 2; 
             o_decimated_data <= 0;
             o_data_valid     <= 1'b0;
             

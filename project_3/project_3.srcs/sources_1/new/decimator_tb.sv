@@ -53,7 +53,7 @@ module decimator_tb;
 
     // 100MHz Clock Generation (10ns period)
     initial begin
-        i_clk = 1'b0;
+        i_clk = 1'b1;
     end
     always begin
         #5 i_clk = ~i_clk; 
@@ -73,6 +73,7 @@ module decimator_tb;
         i_data  = {DATA_W{1'b0}};
         
         // 2. Set up dummy coefficients (symmetric pass-through for test stability)
+        /*
         tb_coeffs[0] = 12'sd1;  
         tb_coeffs[1] = 12'sd2;  
         tb_coeffs[2] = 12'sd3;  
@@ -80,16 +81,24 @@ module decimator_tb;
         tb_coeffs[4] = 12'sd3;
         tb_coeffs[5] = 12'sd2;
         tb_coeffs[6] = 12'sd1;
+        */
+        tb_coeffs[0] = 12'sd1;  
+        tb_coeffs[1] = 12'sd1;  
+        tb_coeffs[2] = 12'sd1;  
+        tb_coeffs[3] = 12'sd1;  
+        tb_coeffs[4] = 12'sd1;
+        tb_coeffs[5] = 12'sd1;
+        tb_coeffs[6] = 12'sd1;
 
-        #100;
-        
-        @(posedge i_clk);
+        #93;
         i_rst_n = 1'b1;
-        
+ 
+        #7;
         $display("[TB] Starting continuous sample driving...");
         repeat(200) begin
             @(posedge i_clk);
             i_data = $rtoi(amplitude * $sin(2.0 * pi * frequency * step / sampling_rate));
+            //i_data = i_data + 10;
             step = step + 1;
         end
 
