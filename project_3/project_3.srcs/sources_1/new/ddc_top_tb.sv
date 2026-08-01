@@ -69,7 +69,7 @@ module ddc_top_tb;
         .DEC_FACTOR (DEC_FACTOR),
         .PHASE_ACC_W(PHASE_ACC_W),
         .F_SAMP     (CLK_FREQ),
-        .F_CARR     ( )// F_TARGET
+        .F_CARR     ( )  // .F_CARR (F_TARGET), currently for testing
     ) uut (
         .clk          (clk),
         .rst_n        (rst_n),

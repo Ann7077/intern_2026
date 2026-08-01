@@ -36,7 +36,7 @@ module decimator_tb;
     wire                      o_data_valid;
 
     // Unit Under Test (UUT)
-    decimator #(
+    decimator_b #(
         .DATA_W(DATA_W),
         .COEFF_W(COEFF_W),
         .CAS_W(CAS_W),

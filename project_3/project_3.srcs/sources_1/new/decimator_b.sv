@@ -24,8 +24,8 @@ module decimator_b # (
     parameter DATA_W     = 12,  
     parameter COEFF_W    = 12,  
     parameter CAS_W      = 32,  
-    parameter TAPS       = 7,  
-    parameter DEC_FACTOR = 3   
+    parameter TAPS       = 7,   // 32
+    parameter DEC_FACTOR = 3    // 10
 )(
     input  wire i_clk,
     input  wire i_rst_n,
@@ -39,7 +39,7 @@ module decimator_b # (
     localparam TAPS_PER_BRANCH = (TAPS + DEC_FACTOR - 1) / DEC_FACTOR;
 
     // 1. Fast Domain: Delay line to feed the phase switches
-    reg signed [DATA_W-1:0] fast_reg [0:DEC_FACTOR-1];
+    reg signed [DATA_W-1:0] fast_reg [0:DEC_FACTOR-1];   // array of registers operating at the full input clock rate (100 MHz)
 
     always @(posedge i_clk or negedge i_rst_n) begin
         if (!i_rst_n) begin
@@ -59,8 +59,8 @@ module decimator_b # (
     reg [$clog2(DEC_FACTOR)-1:0] sample_cnt;  // $clog2 is "ceiling of log base 2"
 
     // 3. Symmetric 2D Matrix Storage for Balanced Polyphase Processing
-    reg signed [DATA_W-1:0]  poly_reg_2d    [0:DEC_FACTOR-1][0:TAPS_PER_BRANCH-1];
-    reg signed [COEFF_W-1:0] poly_coeffs_2d [0:DEC_FACTOR-1][0:TAPS_PER_BRANCH-1];
+    reg signed [DATA_W-1:0]  poly_reg_2d    [0:DEC_FACTOR-1][0:TAPS_PER_BRANCH-1];  // 2D array representing the state/delay registers inside each polyphase branch
+    reg signed [COEFF_W-1:0] poly_coeffs_2d [0:DEC_FACTOR-1][0:TAPS_PER_BRANCH-1];  // 2D array storing the FIR filter coefficients redistributed across parallel sub-filter branches.
     
     reg signed [CAS_W-1:0]   acc;
 
