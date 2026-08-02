@@ -24,7 +24,7 @@ module ddc_top #(
     parameter DDS_W        = 12,              // Bit width of DDS sine/cosine outputs
     parameter MIX_W        = 24,              // Mixer output bit width (INPUT_W + DDS_W)
     parameter FIR_COEFF_W  = 12,              // FIR coefficient bit width
-    parameter FIR_OUT_W    = 32,              // Final output bit width
+    parameter FIR_OUT_W    = 32,              // Final output bit width  
     parameter FIR_TAPS     = 32,              // Number of FIR taps
     parameter DECI_COEFF_W = 12,              // Decimator coefficient bit width
     parameter DECI_TAPS    = 32,              // Number of decimator taps

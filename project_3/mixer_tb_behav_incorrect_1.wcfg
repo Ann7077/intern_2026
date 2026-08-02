@@ -11,13 +11,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="185485100fs"></ZoomStartTime>
-      <ZoomEndTime time="236485101fs"></ZoomEndTime>
-      <Cursor1Time time="261685000fs"></Cursor1Time>
+      <ZoomStartTime time="190060000fs"></ZoomStartTime>
+      <ZoomEndTime time="397060001fs"></ZoomEndTime>
+      <Cursor1Time time="288660000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="144"></NameColumnWidth>
-      <ValueColumnWidth column_width="144"></ValueColumnWidth>
+      <ValueColumnWidth column_width="129"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="11" />
    <wvobject fp_name="/ddc_top_tb/clk" type="logic">
@@ -38,23 +38,24 @@
       <obj_property name="ElementShortName">i_mix[23:0]</obj_property>
       <obj_property name="ObjectShortName">i_mix[23:0]</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
-      <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      <obj_property name="WaveformStyle">STYLE_ANALOG</obj_property>
+      <obj_property name="CellHeight">100</obj_property>
    </wvobject>
    <wvobject fp_name="/ddc_top_tb/o_i_data" type="array">
-      <obj_property name="ElementShortName">o_i_data[31:0]</obj_property>
-      <obj_property name="ObjectShortName">o_i_data[31:0]</obj_property>
+      <obj_property name="ElementShortName">o_i_data[37:0]</obj_property>
+      <obj_property name="ObjectShortName">o_i_data[37:0]</obj_property>
       <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/ddc_top_tb/uut/i_fir" type="array">
-      <obj_property name="ElementShortName">i_fir[31:0]</obj_property>
-      <obj_property name="ObjectShortName">i_fir[31:0]</obj_property>
+      <obj_property name="ElementShortName">i_fir[37:0]</obj_property>
+      <obj_property name="ObjectShortName">i_fir[37:0]</obj_property>
       <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/ddc_top_tb/uut/u_decimator_i/poly_reg_2d" type="array">
-      <obj_property name="ElementShortName">poly_reg_2d[0:2][0:2][23:0]</obj_property>
-      <obj_property name="ObjectShortName">poly_reg_2d[0:2][0:2][23:0]</obj_property>
+      <obj_property name="ElementShortName">poly_reg_2d[0:2][0:7][23:0]</obj_property>
+      <obj_property name="ObjectShortName">poly_reg_2d[0:2][0:7][23:0]</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/ddc_top_tb/uut/u_decimator_i/sample_cnt" type="array">
@@ -63,13 +64,13 @@
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/ddc_top_tb/uut/u_decimator_i/poly_coeffs_2d" type="array">
-      <obj_property name="ElementShortName">poly_coeffs_2d[0:2][0:2][11:0]</obj_property>
-      <obj_property name="ObjectShortName">poly_coeffs_2d[0:2][0:2][11:0]</obj_property>
+      <obj_property name="ElementShortName">poly_coeffs_2d[0:2][0:7][15:0]</obj_property>
+      <obj_property name="ObjectShortName">poly_coeffs_2d[0:2][0:7][15:0]</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/ddc_top_tb/uut/u_decimator_i/acc" type="array">
-      <obj_property name="ElementShortName">acc[31:0]</obj_property>
-      <obj_property name="ObjectShortName">acc[31:0]</obj_property>
+      <obj_property name="ElementShortName">acc[37:0]</obj_property>
+      <obj_property name="ObjectShortName">acc[37:0]</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/ddc_top_tb/uut/u_decimator_i/fast_reg" type="array">

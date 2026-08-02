@@ -28,11 +28,11 @@ module ddc_top_tb;
     localparam INPUT_W       = 12;
     localparam DDS_W         = 12;
     localparam MIX_W         = 24;
-    localparam FIR_COEFF_W   = 12;
-    localparam FIR_TAPS      = 7; // 32;
-    localparam FIR_OUT_W     = 32;
-    localparam DECI_COEFF_W  = 12;
-    localparam DECI_TAPS     = 7; // 32;
+    localparam FIR_COEFF_W   = 16; // constant
+    localparam FIR_TAPS      = 33; // 32;
+    localparam FIR_OUT_W     = 38; 
+    localparam DECI_COEFF_W  = 16; // constant
+    localparam DECI_TAPS     = 23; // 32;
     localparam DEC_FACTOR    = 3; // 10;
     localparam PHASE_ACC_W   = 32;
 
@@ -94,12 +94,17 @@ module ddc_top_tb;
 
     // FIR Coefficients
     initial begin
-        fir_coeffs = '{1,1,1,1,1,1,1};
+        fir_coeffs = '{-66,   -108,   -171,   -229,   -259,   -233,   -120,    106,    462,
+      946,   1540,   2203,   2879,   3502,   4007,   4335,   4449,   4335,
+     4007,   3502,   2879,   2203,   1540,    946,    462,    106,   -120,
+     -233,   -259,   -229,   -171,   -108,    -66};
     end
     
     // Decimator Coefficients
     initial begin
-        deci_coeffs = '{1,1,1,1,1,1,1};
+        deci_coeffs = '{-329, -103, 28, 301, 733, 1313, 2004, 2742, 3446,
+                        4029, 4415, 4549, 4415, 4029, 3446, 2742, 2004, 1313,
+                        733, 301, 28, -103, -329};
     end
 
     // Signal Generation: 20 MHz Signal + 35 MHz Interference
