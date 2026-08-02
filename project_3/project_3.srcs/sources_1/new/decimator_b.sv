@@ -84,7 +84,7 @@ module decimator_b # (
     // 5. Downsampling, Shifting, and Accumulation 
     always @(posedge i_clk or negedge i_rst_n) begin
         if (!i_rst_n) begin
-            sample_cnt       <= 2; 
+            sample_cnt       <= DEC_FACTOR - 1;   // so counter always start at zero
             o_decimated_data <= 0;
             o_data_valid     <= 1'b0;
             
@@ -96,6 +96,7 @@ module decimator_b # (
         end else begin
             if (sample_cnt == (DEC_FACTOR - 1)) begin
                 sample_cnt   <= 0;
+                // o_decimated_data <= i_data;      ////////////////////////////////////////////////////////////////
                 o_data_valid <= 1'b1;
                 
                 // The Symmetrical 2D Shift Register Line
