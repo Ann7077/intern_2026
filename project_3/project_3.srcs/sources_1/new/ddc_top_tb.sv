@@ -33,7 +33,7 @@ module ddc_top_tb;
     localparam FIR_OUT_W     = 38; 
     localparam DECI_COEFF_W  = 16; // constant
     localparam DECI_TAPS     = 23; // 32;
-    localparam DEC_FACTOR    = 3; // 10;
+    localparam DEC_FACTOR    = 10; // 10;
     localparam PHASE_ACC_W   = 32;
 
     localparam real F_TARGET = 19_000_000.0; // 20 MHz carrier
