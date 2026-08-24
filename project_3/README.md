@@ -92,7 +92,7 @@ The decimator module downsamples the filtered baseband signal by a factor of $M$
 ## Polyphase Integration (Optimization)
 
 **Reference:** 
-[Notes_about_Basic_Polyphase_Decimation_Filters.pdf](vx_images/Notes_about_Basic_Polyphase_Decimation_Filters.pdf)
+Page 8 of  [Notes_about_Basic_Polyphase_Decimation_Filters.pdf](vx_images/Notes_about_Basic_Polyphase_Decimation_Filters.pdf)
 
 
 
