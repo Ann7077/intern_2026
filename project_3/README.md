@@ -1,7 +1,10 @@
 # Overall DDC
-The point of a ddc is when a low frequency signal is sent, for convinient reasons, it is transported using high frequency signal, and when the signal arrived, ddc is used to convert the signal back to low frequency. The signal we receive is $a(t) \cos (\omega_ct + \phi(t))$ where $\omega_c$ is really big. So we generated a $\cos \omega_ct$ signal to multiply with the original signal (done by the mixer), to separate the high and low pass signal. Then we used a low pass filter to filter out the high frequency part of the signal. Then put the signal in the decimator for down sampling.
+The purpose of a Digital Down Converter (DDC) is to take a received high-frequency signal and convert it back down to a low-frequency signal. Because low-frequency data is originally transmitted using a high-frequency carrier wave for convenience, the DDC process reverses this so the original low-frequency information can be isolated.
 
-**Goal:**
+To process the signal, the receiver multiplies the incoming high-frequency signal with a locally generated signal inside a mixer, which splits the signal into high-frequency and low-frequency components. Next, a lowpass filter removes the unwanted high-frequency part, leaving only the low-frequency signal. Finally, the signal is sent through a decimator to reduce its sampling rate.
+
+## Goal
+The goal is to convert a high-frequency real intermediate frequency (IF) signal into a complex baseband signal (I/Q data) by removing the high-frequency carrier wave.
 
 $$
 a(t) \cos (\omega_ct + \phi(t)) \longrightarrow a(t)e^{j\phi(t)} = a(t)\cos(\phi(t))+ja(t)\sin(\phi(t))
