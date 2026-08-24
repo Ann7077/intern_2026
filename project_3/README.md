@@ -47,18 +47,18 @@ On every rising edge of `clk` (when reset `rst_n` is inactive), the module calcu
 
 $I$-branch
 $$
-\begin{align}
+\begin{aligned}
 a(t) \cos (\omega_ct + \phi(t)) \cos \omega_ct &= a(t) \frac{1}{2}(\cos(\omega_ct+\phi(t)-\omega_ct) + \cos(\omega_ct+\phi(t)+\omega_ct)) \\
                                                &= \frac{1}{2} (a(t) \cos(\phi (t)) + a(t) \cos (2\omega_ct+\phi(t))) \\
-\end{align}
+\end{aligned}
 $$
 
 $Q$-branch
 $$
-\begin{align}
+\begin{aligned}
 a(t) \cos (\omega_ct + \phi(t)) (\sin \omega_ct) &= a(t) \frac{1}{2}(\sin(\omega_ct+\phi(t)+\omega_ct) - \sin(\omega_ct+\phi(t)-\omega_ct)) \\
                                                  &= \frac{1}{2}(a(t)\sin(2\omega_ct+\phi(t)) - a(t)\sin(\phi(t)))\\
-\end{align}
+\end{aligned}
 $$
 
 
