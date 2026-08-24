@@ -46,6 +46,7 @@ On every rising edge of `clk` (when reset `rst_n` is inactive), the module calcu
 * **$Q$-Branch Output (`q_out`):** `adc_data * dds_sin` $\longrightarrow$ extracts $Q(t)$ baseband component + high-frequency $2\omega_c$ sum term.
 
 $I$-branch
+
 $$
 \begin{aligned}
 a(t) \cos (\omega_ct + \phi(t)) \cos \omega_ct &= a(t) \frac{1}{2}(\cos(\omega_ct+\phi(t)-\omega_ct) + \cos(\omega_ct+\phi(t)+\omega_ct)) \\
@@ -54,6 +55,7 @@ a(t) \cos (\omega_ct + \phi(t)) \cos \omega_ct &= a(t) \frac{1}{2}(\cos(\omega_c
 $$
 
 $Q$-branch
+
 $$
 \begin{aligned}
 a(t) \cos (\omega_ct + \phi(t)) (\sin \omega_ct) &= a(t) \frac{1}{2}(\sin(\omega_ct+\phi(t)+\omega_ct) - \sin(\omega_ct+\phi(t)-\omega_ct)) \\
