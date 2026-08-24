@@ -49,8 +49,8 @@ $I$-branch
 
 $$
 \begin{aligned}
-a(t) \cos (\omega_ct + \phi(t)) \cos \omega_ct &= a(t) \frac{1}{2}(\cos(\omega_ct+\phi(t)-\omega_ct) + \cos(\omega_ct+\phi(t)+\omega_ct)) \\
-                                               &= \frac{1}{2} (a(t) \cos(\phi (t)) + a(t) \cos (2\omega_ct+\phi(t))) \\
+a(t) \cos (\omega_ct + \phi(t)) (\cos \omega_ct) &= a(t) \frac{1}{2}(\cos(\omega_ct+\phi(t)-\omega_ct) + \cos(\omega_ct+\phi(t)+\omega_ct)) \\
+                                                 &= \frac{1}{2} (a(t) \cos(\phi (t)) + a(t) \cos (2\omega_ct+\phi(t))) \\
 \end{aligned}
 $$
 
