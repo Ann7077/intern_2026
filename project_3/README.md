@@ -1,5 +1,5 @@
 # Overall DDC
-The purpose of a Digital Down Converter (DDC) is to take a received high-frequency signal and convert it back down to a low-frequency signal. Because low-frequency data is originally transmitted using a high-frequency carrier wave for convenience, the DDC process reverses this so the original low-frequency information can be isolated.
+The purpose of a Digital Down Converter (DDC) is to take a received high-frequency signal and convert it back down to a low-frequency signal. Because low-frequency data is originally transmitted using a high-frequency carrier wave for convenience, the DDC process reverses this so the original low-frequency information can be recovered.
 
 To process the signal, the receiver multiplies the incoming high-frequency signal with a locally generated signal inside a mixer, which splits the signal into high-frequency and low-frequency components. Next, a lowpass filter removes the unwanted high-frequency part, leaving only the low-frequency signal. Finally, the signal is sent through a decimator to reduce its sampling rate.
 
@@ -127,6 +127,25 @@ The `ddc_top_tb` module serves as the simulation environment to verify top-level
 # Final Result
 ![final_wave_result.png](<vx_images/final_wave_result.png>)
 
-**Signals from top to bottom:** clock, reset, dds sine, dds cosine, mixer I out, mixer Q out, FIR I output data, FIR Q output data, decimator I output data, decimator Q output data
+**Signals from top to bottom:** 
+* `clk` clock 
+* `rst_n` reset 
+* `dds_sin` dds sine 
+* `dds_cos` dds cosine  
+* `adc_data` mixer adc data 
+* `i_out` mixer I out 
+* `q_out` mixer Q out 
+* `i_data` FIR I input data 
+* `o_data` FIR I output data 
+* `o_decimated_data` decimator I output data 
+* `i_data` FIR Q input data 
+* `o_data` FIR Q output data 
+* `o_decimated_data` decimator Q output data 
 
+
+
+
+# Future work
+- **Trim unnecessary bits:** Oversized the bit limits in several places to guarantee plenty of room, but this can be cleaned up and trimmed down to save resources.
+- **Reduce DDS Memory:** Save look-up table space by storing only 1/4 of the wave period and using symmetry to generate the rest.
 
