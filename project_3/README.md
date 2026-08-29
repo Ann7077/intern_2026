@@ -223,17 +223,66 @@ The high-frequency term $\frac{1}{2}\cos(2\omega_c t + \phi(t))$ drops to zero, 
 
 
 
-# Decimator
-The decimator module downsamples the filtered baseband signal by a factor of $M$, reducing the sample rate from $F_s$ to $F_s/M$. This lowers the data throughput to the required bandwidth, saving processing power and memory for downstream baseband processing.
+# Decimator (`decimator_b.sv`)
 
-## Core Operations
-* **Sample Rate Reduction:** Retains 1 out of every $M$ incoming samples from the FIR filter and discards the intermediate $M-1$ samples. Here we gave $M = 10$. We cannot take any values larger than $M=10$ due to Nyquist sampling theorem, because then the sampling rate will be less than twice the stopband and cause aliasing.
-* **Clock & Valid Control:** Generates a output data valid pulse (`valid_out`) every $M$ clock cycles to signal when a new downsampled sample is available.
+## 1. What Does This File Do?
 
-## Polyphase Integration (Optimization)
+The `decimator_b.sv` file acts as a **smart data downsampler**. Now that the FIR filter has cleaned up the signal, we still have $100\text{ million}$ samples coming in every second ($100\text{ MSPS}$). Because our slow baseband signal doesn't need that many data points to stay accurate, the decimator safely reduces the sample rate by a factor of 10 down to $10\text{ million}$ samples per second ($10\text{ MSPS}$).
+
+
+## 2. Inputs & Outputs Overview
+
+| Signal Name | Input or Output? | Bit Size | Simple Meaning & Purpose |
+| --- | --- | --- | --- |
+| `clk` | Input | 1 bit | The main system clock running at $100\text{ MHz}$. |
+| `rst_n` | Input | 1 bit | The active-low reset button. |
+| `i_data` | Input | 24 bits | The cleaned baseband data stream coming in at full speed. |
+| `i_coeffs` | Input | Sub-filter array | Pre-defined coefficients used by the internal sub-filter branches. |
+| `o_decimated_data` | Output | 38 bits | The downsampled output data stream operating at $1/10\text{th}$ the rate. |
+| `o_data_valid` | Output | 1 bit | **Valid Strobe:** A flag that turns ON for 1 clock cycle every 10 ticks to mark a new sample. |
+
+
+## 3. How the Input Becomes the Output (Step-by-Step)
+
+1. **Collect High-Speed Samples:** The module accepts incoming samples on every clock cycle at $100\text{ MHz}$.
+
+2. **Polyphase Implementation (External Reference):** I do not fully understand the intricate mathematical mechanics of how polyphase filtering works under the hood. Rather than attempting to explain the complex sub-filtering math, I relied on external reference code and established designs to implement this polyphase structure in the module.
+
+3. **Count Clock Cycles:** An internal counter tracks incoming clock cycles from 1 to 10.
+
+4. **Hold & Pulse:** On every 10th clock cycle, the module updates `o_decimated_data` with the latest processed value and pulses `o_data_valid` HIGH for 1 cycle.
+
+5. **Hold Value:** During the 9 clock cycles in between, the output holds its previous value steady while waiting for the next 10th tick.
 
 **Reference:** 
 Page 8 of  [Notes_about_Basic_Polyphase_Decimation_Filters.pdf](vx_images/Notes_about_Basic_Polyphase_Decimation_Filters.pdf)
+
+
+## 4. Mathematical Proofs: Why Downsampling Rate Reduction Works
+
+**How does keeping 1 out of every 10 samples change the sample rate?**
+Decimation by a factor of $M = 10$ means taking a signal sampled at clock frequency $F_{s,\text{in}} = 100\text{ MHz}$ and dropping the sample frequency down to $F_{s,\text{out}}$:
+
+$$F_{s,\text{out}} = \frac{F_{s,\text{in}}}{M} = \frac{100\text{ MHz}}{10} = 10\text{ MHz}$$
+
+In time-domain notation, if $x[n]$ is our filtered input sequence, the decimated output sequence $y[m]$ takes every 10th sample:
+
+$$y[m] = x[m \cdot 10] \quad \text{where } m = 0, 1, 2, \dots$$
+
+**Why is this safe according to Nyquist?**
+The Nyquist sampling theorem states that to prevent signal distortion (aliasing), our sampling rate must be at least twice the highest frequency component of our desired signal ($F_{\text{max}}$):
+
+$$F_{s,\text{out}} \ge 2 \cdot F_{\text{max}}$$
+
+Because our previous FIR filter already removed all frequencies above $5\text{ MHz}$, dropping the sampling rate to $10\text{ MHz}$ ($2 \times 5\text{ MHz}$) perfectly preserves all original information without losing data quality.
+
+
+## 5. Expetation vs Result
+
+* **What to Expect:** Instead of a smooth continuous curve that shifts every single clock cycle, `o_decimated_data` will look like a **staircase wave**. The signal holds flat for 10 clock ticks, steps up or down to the next value, and holds flat again. Meanwhile, `o_data_valid` should look like a periodic train of single-width pulses spaced 10 clock cycles apart.
+
+
+* **Verification Against Results:** In the simulation plots, `o_decimated_data` steps along the baseband wave shape every 10 clock cycles while `o_data_valid` blinks ON precisely every 10th cycle, confirming $10\times$ decimation.
 
 
 
@@ -262,7 +311,6 @@ The `ddc_top_tb` module serves as the simulation environment to verify top-level
 
 
 
-
 # Final Result
 ![final_wave_result.png](<vx_images/final_wave_result.png>)
 
@@ -283,8 +331,6 @@ The `ddc_top_tb` module serves as the simulation environment to verify top-level
 
 
 
-
-
 # Future work
 - **Trim unnecessary bits:** Oversized the bit limits in several places to guarantee plenty of room, but this can be cleaned up and trimmed down to save resources.
 - **Reduce DDS Memory:** Save look-up table space by storing only 1/4 of the wave period and using symmetry to generate the rest.
@@ -300,8 +346,6 @@ Should they look like that? Why or why not?
 Show the steps of how you got the output from input.
 
 
-$$\text{o\_data} = \text{LPF}\left\{\frac{1}{2}\cos(\phi(t)) + \frac{1}{2}\cos(2\omega_c t + \phi(t))\right\}$$
-$$\text{o\_data} = \frac{1}{2}\cos(\phi(t)) + 0 = \frac{1}{2}\cos(\phi(t))$$
 
-
+---
 
