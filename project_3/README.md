@@ -194,7 +194,7 @@ The `mac_fir` module is the fundamental building block of the FIR filter. It han
 **How does the filter math cancel out the unwanted ripple?**
 The FIR filter performs discrete convolution in time:
 
-$$\text{o\\_data}[n] = \sum_{k=0}^{31} b_k \cdot \text{i\_data}[n-k]$$
+$$\text{o\\_data}[n] = \sum_{k=0}^{31} b_k \cdot \text{i\\_data}[n-k]$$
 
 Where $b_k$ represents the filter coefficients.
 
@@ -206,8 +206,9 @@ When passed into the low-pass filter ($\text{LPF}$), coefficients $b_k$ are math
 
 $$
 \begin{aligned}
-\text{o\\_data} &= \text{LPF}\left\{\frac{1}{2}\cos(\phi(t)) + \frac{1}{2}\cos(2\omega_c t + \phi(t))\right\}
-                &= \frac{1}{2}\cos(\phi(t)) + 0 = \frac{1}{2}\cos(\phi(t))
+\text{o\\_data} &= \text{LPF}\left{\frac{1}{2}\cos(\phi(t)) + \frac{1}{2}\cos(2\omega_c t + \phi(t))\right\}
+                &= \frac{1}{2}\cos(\phi(t)) + 0 
+                &= \frac{1}{2}\cos(\phi(t))
 \end{aligned}
 $$
 
@@ -300,7 +301,3 @@ Show the steps of how you got the output from input.
 
 
 
----
-$$\text{i\\_}\text{out}$$ .........
-
-$$\text{i\\_out}$$ .........
