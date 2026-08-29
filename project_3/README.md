@@ -301,4 +301,22 @@ Show the steps of how you got the output from input.
 
 
 ---
+$$\text{i}\_\text{out}$$
+
+
 $$\texttt{i\_}\text{out}$$
+
+$$\texttt{i\\_}\text{out}$$
+
+$$\text{i\_}\text{out}$$
+
+$$\text{i\\_}\text{out}$$
+
+
+$$\texttt{i}\text{\_out}$$
+
+$$\texttt{i}\text{\\_out}$$
+
+$$\text{i}\text{\_out}$$
+
+$$\text{i}\text{\\_out}$$
