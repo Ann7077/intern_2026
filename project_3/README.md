@@ -329,7 +329,7 @@ $$\text{o\\_q\\_data}[m] = \text{q\\_fir}[10m] = -\frac{1}{2}s(10m T_s)\sin(\phi
 * **Verification Against Results:** In the full system simulation, `o_i_data` and `o_q_data` cleanly trace out low-frequency sine and cosine envelopes in stair-step fashion, with `o_data_valid` firing every 10 clock cycles, confirming the top-level module is integrated properly.
 
 
-## Verification & Testbench (`ddc_top_tb`)
+## 6. Verification & Testbench (`ddc_top_tb`)
 The `ddc_top_tb` module serves as the simulation environment to verify top-level DDC functional accuracy. It generates real-time synthetic input signals, applies pre-computed MATLAB filter coefficients, and logs output data for external analysis.
 
 ### Key Features & Test Setup
