@@ -301,4 +301,4 @@ Show the steps of how you got the output from input.
 
 
 ---
-$$\text{i}\text{_out}$$
+$$\text{i\_}\text{out}$$
