@@ -295,6 +295,8 @@ Show the steps of how you got the output from input.
 
 
 ---
+$$\text{adc\_data}$$
+
 $$\text{adc\\_data}$$
 
 $$\texttt{adc\\_data}$$
