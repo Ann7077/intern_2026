@@ -115,7 +115,9 @@ The `mixer.v` file takes the incoming high-frequency radio signal (`adc_data`) a
 **Why does multiplying signals shift the frequency down?**
 Let's represent our incoming signal as a wave with frequency $\omega_c$ carrying some data phase $\phi(t)$:
 
-$$\text{adc\_data} = \cos(\omega_c t + \phi(t))$$
+$$
+\text{adc\_data} = \cos(\omega_c t + \phi(t))
+$$
 
 When we multiply this incoming wave by our local cosine wave $\cos(\omega_c t)$, we use the classic trigonometric product identity:
 
@@ -123,9 +125,14 @@ $$\cos(A) \cdot \cos(B) = \frac{1}{2}\cos(A - B) + \frac{1}{2}\cos(A + B)$$
 
 Plugging in our waves for the In-Phase ($I$) branch:
 
-$$\text{i\_out} = \cos(\omega_c t + \phi(t)) \cdot \cos(\omega_c t)$$
+$$
+\text{i\_out} = \cos(\omega_c t + \phi(t)) \cdot \cos(\omega_c t)
+$$
 
-$$\text{i\_out} = \frac{1}{2}\cos(\phi(t)) + \frac{1}{2}\cos(2\omega_c t + \phi(t))$$
+
+$$
+\text{i\_out} = \frac{1}{2}\cos(\phi(t)) + \frac{1}{2}\cos(2\omega_c t + \phi(t))
+$$
 
 Notice what happens:
 
