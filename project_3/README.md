@@ -301,3 +301,5 @@ $$\texttt{adc\\_data}$$
 
 $$\texttt{adc\_data}$$
 
+$$\text{\mathrm{adc\_data}}$$
+
