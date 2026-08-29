@@ -115,7 +115,7 @@ The `mixer.v` file takes the incoming high-frequency radio signal (`adc_data`) a
 **Why does multiplying signals shift the frequency down?**
 Let's represent our incoming signal as a wave with frequency $\omega_c$ carrying some data phase $\phi(t)$:
 
-$$\text{adc\_data} = \cos(\omega_c t + \phi(t))$$
+$$\text{adc}\_\text{data} = \cos(\omega_c t + \phi(t))$$
 
 When we multiply this incoming wave by our local cosine wave $\cos(\omega_c t)$, we use the classic trigonometric product identity:
 
@@ -123,9 +123,12 @@ $$\cos(A) \cdot \cos(B) = \frac{1}{2}\cos(A - B) + \frac{1}{2}\cos(A + B)$$
 
 Plugging in our waves for the In-Phase ($I$) branch:
 
-$$\text{i\_out} = \cos(\omega_c t + \phi(t)) \cdot \cos(\omega_c t)$$
-
-$$\text{i\_out} = \frac{1}{2}\cos(\phi(t)) + \frac{1}{2}\cos(2\omega_c t + \phi(t))$$
+$$
+\begin{aligned}
+\text{i}\_\text{out} &= \cos(\omega_c t + \phi(t)) \cdot \cos(\omega_c t) \\
+                     &= \frac{1}{2}\cos(\phi(t)) + \frac{1}{2}\cos(2\omega_c t + \phi(t)) \\
+\end{aligned}
+$$
 
 Notice what happens:
 
@@ -135,7 +138,7 @@ Notice what happens:
 
 Doing the exact same steps with the sine wave for the Quadrature ($Q$) branch gives us:
 
-$$\text{q\_out} = \cos(\omega_c t + \phi(t)) \cdot \sin(\omega_c t) = \frac{1}{2}\sin(2\omega_c t + \phi(t)) - \frac{1}{2}\sin(\phi(t))$$
+$$\text{q}\_\text{out} = \cos(\omega_c t + \phi(t)) \cdot \sin(\omega_c t) = \frac{1}{2}\sin(2\omega_c t + \phi(t)) - \frac{1}{2}\sin(\phi(t))$$
 
 
 ## 5. Expetation vs Result
@@ -191,19 +194,22 @@ The `mac_fir` module is the fundamental building block of the FIR filter. It han
 **How does the filter math cancel out the unwanted ripple?**
 The FIR filter performs discrete convolution in time:
 
-$$\text{o\_data}[n] = \sum_{k=0}^{31} b_k \cdot \text{i\_data}[n-k]$$
+$$\text{o}\_\text{data}[n] = \sum_{k=0}^{31} b_k \cdot \text{i\_data}[n-k]$$
 
 Where $b_k$ represents the filter coefficients.
 
 From the mixer step, our input `i_data` contains two parts—a slow baseband signal and a high-frequency ripple:
 
-$$\text{i\_data} = \underbrace{\frac{1}{2}\cos(\phi(t))}_{\text{Desired Baseband}} + \underbrace{\frac{1}{2}\cos(2\omega_c t + \phi(t))}_{\text{Unwanted Ripple}}$$
+$$\text{i}\_\text{data} = \underbrace{\frac{1}{2}\cos(\phi(t))}_{\text{Desired Baseband}} + \underbrace{\frac{1}{2}\cos(2\omega_c t + \phi(t))}_{\text{Unwanted Ripple}}$$
 
 When passed into the low-pass filter ($\text{LPF}$), coefficients $b_k$ are mathematically designed to block frequencies at or above $2\omega_c$:
 
-$$\text{o\_data} = \text{LPF}\left\{\frac{1}{2}\cos(\phi(t)) + \frac{1}{2}\cos(2\omega_c t + \phi(t))\right\}$$
-
-$$\text{o\_data} = \frac{1}{2}\cos(\phi(t)) + 0 = \frac{1}{2}\cos(\phi(t))$$
+$$
+\begin{aligned}
+\text{o}\_\text{data} &= \text{LPF}\left\{\frac{1}{2}\cos(\phi(t)) + \frac{1}{2}\cos(2\omega_c t + \phi(t))\right\}
+                      &= \frac{1}{2}\cos(\phi(t)) + 0 = \frac{1}{2}\cos(\phi(t))
+\end{aligned}
+$$
 
 The high-frequency term $\frac{1}{2}\cos(2\omega_c t + \phi(t))$ drops to zero, leaving only the pure baseband data!
 
