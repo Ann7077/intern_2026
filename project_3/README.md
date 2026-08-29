@@ -305,3 +305,4 @@ $$\texttt{adc\_data}$$
 
 $$\text{\mathrm{adc\_data}}$$
 
+$$\text{adc}\_\text{data}$$
