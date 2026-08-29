@@ -301,14 +301,4 @@ Show the steps of how you got the output from input.
 
 
 ---
-$$\text{adc\_data}$$
-
-$$\text{adc\\_data}$$
-
-$$\texttt{adc\\_data}$$
-
-$$\texttt{adc\_data}$$
-
-$$\text{\mathrm{adc\_data}}$$
-
-$$\text{adc}\_\text{data}$$
+$$\text{i}\text{_out}$$
