@@ -206,7 +206,7 @@ When passed into the low-pass filter ($\text{LPF}$), coefficients $b_k$ are math
 
 $$
 \begin{aligned}
-\text{o\\_data} &= \text{LPF}\left{\frac{1}{2}\cos(\phi(t)) + \frac{1}{2}\cos(2\omega_c t + \phi(t))\right\}
+\text{o\\_data} &= \text{LPF}\left\{\frac{1}{2}\cos(\phi(t)) + \frac{1}{2}\cos(2\omega_c t + \phi(t))\right}
                 &= \frac{1}{2}\cos(\phi(t)) + 0 
                 &= \frac{1}{2}\cos(\phi(t))
 \end{aligned}
@@ -298,6 +298,10 @@ What is their meaning/purpose?
 Why are they like that? Use equation to prove.
 Should they look like that? Why or why not? 
 Show the steps of how you got the output from input.
+
+
+$$\text{o\_data} = \text{LPF}\left\{\frac{1}{2}\cos(\phi(t)) + \frac{1}{2}\cos(2\omega_c t + \phi(t))\right\}$$
+$$\text{o\_data} = \frac{1}{2}\cos(\phi(t)) + 0 = \frac{1}{2}\cos(\phi(t))$$
 
 
 
