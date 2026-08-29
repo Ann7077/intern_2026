@@ -340,22 +340,30 @@ The `ddc_top_tb` module serves as the simulation environment to verify top-level
 
 
 # Final Result
+
 ![final_wave_result.png](<vx_images/final_wave_result.png>)
 
-**Signals from top to bottom:** 
-* `clk` clock 
-* `rst_n` reset 
-* `dds_sin` dds sine 
-* `dds_cos` dds cosine  
-* `adc_data` mixer adc data 
-* `i_out` mixer I out 
-* `q_out` mixer Q out 
-* `i_data` FIR I input data 
-* `o_data` FIR I output data 
-* `o_decimated_data` decimator I output data 
-* `i_data` FIR Q input data 
-* `o_data` FIR Q output data 
-* `o_decimated_data` decimator Q output data 
+## Signal Trace Breakdown (Top to Bottom)
+
+1. **`clk` & `rst_n`:** System clock ($100\text{ MHz}$) and active-low system reset.
+2. **`dds_sin` & `dds_cos`:** Generated $20\text{ MHz}$ quadrature reference carriers from `dds.sv`.
+3. **`adc_data`:** High-speed, high-frequency input passband signal.
+4. **`i_out` & `q_out`:** Mixer output signals showing the expected double-frequency ripple riding on top of the slow baseband envelopes.
+5. **$I$-Channel Pipeline (`i_data` $\rightarrow$ `o_data` $\rightarrow$ `o_decimated_data`):**
+    * `i_data`: Raw mixer output fed into the FIR filter.
+    * `o_data`: FIR filter output showing a clean, smooth low-frequency sine wave with all high-frequency ripple stripped away.
+    * `o_decimated_data`: Final downsampled $I$-channel baseband signal updating in $10$-clock-cycle stair-steps ($10\text{ MSPS}$).
+6. **$Q$-Channel Pipeline (`i_data` $\rightarrow$ `o_data` $\rightarrow$ `o_decimated_data`):**
+    * Identical low-pass filtering and decimation process applied to the Quadrature branch, producing the final stair-stepped $Q$-channel baseband output.
+
+
+## System Verification
+
+The waveform trace confirms the full hardware design functions as intended:
+
+* **Mixing:** The high-frequency input is successfully split into $I/Q$ channels with visible $2\omega_c$ ripples.
+* **Filtering:** The FIR filter completely eliminates the high-frequency content, outputting clean, continuous baseband curves.
+* **Decimation:** The polyphase decimator reduces the rate by $10\times$, producing holding stair-step outputs that update every 10 clock cycles while preserving the underlying baseband envelope.
 
 
 
@@ -367,12 +375,12 @@ The `ddc_top_tb` module serves as the simulation environment to verify top-level
 
 ---
 
-What does each file do?
-What are the inputs and outputs? 
-What is their meaning/purpose?
-Why are they like that? Use equation to prove.
-Should they look like that? Why or why not? 
-Show the steps of how you got the output from input.
+* What does each file do?
+* What are the inputs and outputs? 
+* What is their meaning/purpose?
+* Why are they like that? Use equation to prove.
+* Should they look like that? Why or why not? 
+* Show the steps of how you got the output from input.
 
 ---
 
