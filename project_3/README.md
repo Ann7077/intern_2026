@@ -206,9 +206,9 @@ When passed into the low-pass filter ($\text{LPF}$), coefficients $b_k$ are math
 
 $$
 \begin{aligned}
-\text{o\\_data} &= \text{LPF}\left\{\frac{1}{2}\cos(\phi(t)) + \frac{1}{2}\cos(2\omega_c t + \phi(t))\right}
-                &= \frac{1}{2}\cos(\phi(t)) + 0 
-                &= \frac{1}{2}\cos(\phi(t))
+\text{o\\_data} &= \text{LPF} \left\\{ \frac{1}{2}\cos(\phi(t)) + \frac{1}{2}\cos(2\omega_c t + \phi(t)) \right\\}  \\
+                &= \frac{1}{2}\cos(\phi(t)) + 0 \\
+                &= \frac{1}{2}\cos(\phi(t)) \\
 \end{aligned}
 $$
 
