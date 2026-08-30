@@ -36,7 +36,7 @@ module ddc_top_tb;
     localparam DEC_FACTOR    = 10; // 10;
     localparam PHASE_ACC_W   = 32;
 
-    localparam real F_TARGET = 19_000_000.0; // 20 MHz carrier
+    localparam real F_TARGET = 20_000_000.0; // 20 MHz carrier
     localparam real F_INTERF = 35_000_000.0; // 35 MHz interference
     localparam real F_SAMP   = 100_000_000.0; // 100 MHz Sampling rate
     localparam real PI       = 3.1415926535;
@@ -74,7 +74,7 @@ module ddc_top_tb;
         .DEC_FACTOR   (DEC_FACTOR),
         .PHASE_ACC_W  (PHASE_ACC_W),
         .F_SAMP       (CLK_FREQ),
-        .F_CARR       ( )  // .F_CARR (F_TARGET), currently for testing
+        .F_CARR       (F_TARGET)  // .F_CARR (F_TARGET), currently for testing
     ) uut (
         .clk          (clk),
         .rst_n        (rst_n),
@@ -128,7 +128,7 @@ module ddc_top_tb;
             
             // Generate combined cosine waves: Target 20MHz + Interference 35MHz
             sig_target   = 1000.0 * $cos(2.0 * PI * F_TARGET * time_ns);
-            sig_interf   = 0; // 800.0 * $cos(2.0 * PI * F_INTERF * time_ns);
+            sig_interf   = 800.0 * $cos(2.0 * PI * F_INTERF * time_ns);
             sig_combined = sig_target + sig_interf;
 
             // Quantize to 12-bit signed

@@ -10,6 +10,11 @@ $$
 a(t) \cos (\omega_ct + \phi(t)) \longrightarrow a(t)e^{j\phi(t)} = a(t)\cos(\phi(t))+ja(t)\sin(\phi(t))
 $$
 
+Our input signal is `i_if_signal` from `ddc_top_tb.sv`, which equals 
+$$
+\underbrace{1000\cos(2\pi\cdot 20\text{ MHz}\cdot t)}_{\text{target signal}} + \underbrace{800\cos(2\pi\cdot 35\text{ MHz}\cdot t)}_{\text{interference signal}}
+$$
+
 ## Overall diagram
 ![DDC_diagram.png](<vx_images/DDC_diagram.png>)
 
@@ -48,22 +53,30 @@ The `dds.sv` file creates a clean, smooth digital sine (`dds_sin`) and cosine (`
 **How do we set `ftw` to get a target $20\text{ MHz}$ carrier wave?**
 The 32-bit counter wraps around after $2^{32}$ steps (a full $360^\circ$ circle). To find out how big each step (`FTW`) needs to be to make a $20\text{ MHz}$ wave out of a $100\text{ MHz}$ clock, we use this ratio:
 
-$$\text{FTW} = \frac{\text{Target Frequency}}{\text{Clock Frequency}} \times 2^{32}$$
+$$
+\text{FTW} = \frac{\text{Target Frequency}}{\text{Clock Frequency}} \times 2^{32}
+$$
 
 Plugging in our values ($20\text{ MHz}$ target, $100\text{ MHz}$ clock):
 
-$$\text{FTW} = \frac{20}{100} \times 4,294,967,296 = 0.2 \times 4,294,967,296 = 858,993,459$$
+$$
+\text{FTW} = \frac{20}{100} \times 4,294,967,296 = 0.2 \times 4,294,967,296 = 858,993,459
+$$
 
 Adding $858,993,459$ on every clock cycle makes the counter complete a full sine wave cycle once every 5 clock ticks ($100 / 20 = 5$).
 
 **Why do we add $2^{30}$ to get the Cosine wave?**
 A cosine wave is just a sine wave shifted ahead by a quarter of a full turn ($90^\circ$ out of $360^\circ$):
 
-$$\cos(\theta) = \sin(\theta + 90^\circ)$$
+$$
+\cos(\theta) = \sin(\theta + 90^\circ)
+$$
 
 Since a full turn ($360^\circ$) equals $2^{32}$ steps, a quarter turn ($90^\circ$) equals:
 
-$$\frac{1}{4} \times 2^{32} = 2^{30} = \text{\texttt{1'b1 << 30}}$$
+$$
+\frac{1}{4} \times 2^{32} = 2^{30} = \text{\texttt{1'b1 << 30}}
+$$
 
 Adding $2^{30}$ directly to the counter gives us the exact address for the cosine wave without needing a second lookup table.
 
@@ -106,11 +119,15 @@ The `mixer.v` file takes the incoming high-frequency radio signal (`adc_data`) a
 **Why does multiplying signals shift the frequency down?**
 Let's represent our incoming signal as a wave with frequency $\omega_c$ carrying some data phase $\phi(t)$:
 
-$$\text{adc\\_data} = \cos(\omega_c t + \phi(t))$$
+$$
+\text{adc\\_data} = \cos(\omega_c t + \phi(t))
+$$
 
 When we multiply this incoming wave by our local cosine wave $\cos(\omega_c t)$, we use the classic trigonometric product identity:
 
-$$\cos(A) \cdot \cos(B) = \frac{1}{2}\cos(A - B) + \frac{1}{2}\cos(A + B)$$
+$$
+\cos(A) \cdot \cos(B) = \frac{1}{2}\cos(A - B) + \frac{1}{2}\cos(A + B)
+$$
 
 Plugging in our waves for the In-Phase ($I$) branch:
 
@@ -129,7 +146,9 @@ Notice what happens:
 
 Doing the exact same steps with the sine wave for the Quadrature ($Q$) branch gives us:
 
-$$\text{q\\_out} = \cos(\omega_c t + \phi(t)) \cdot \sin(\omega_c t) = \frac{1}{2}\sin(2\omega_c t + \phi(t)) - \frac{1}{2}\sin(\phi(t))$$
+$$
+\text{q\\_out} = \cos(\omega_c t + \phi(t)) \cdot \sin(\omega_c t) = \frac{1}{2}\sin(2\omega_c t + \phi(t)) - \frac{1}{2}\sin(\phi(t))
+$$
 
 
 ## 5. Expetation vs Result
@@ -180,13 +199,17 @@ The `mac_fir` module is the fundamental building block of the FIR filter. It han
 **How does the filter math cancel out the unwanted ripple?**
 The FIR filter performs discrete convolution in time:
 
-$$\text{o\\_data}[n] = \sum_{k=0}^{31} b_k \cdot \text{i\\_data}[n-k]$$
+$$
+\text{o\\_data}[n] = \sum_{k=0}^{31} b_k \cdot \text{i\\_data}[n-k]
+$$
 
 Where $b_k$ represents the filter coefficients.
 
 From the mixer step, our input `i_data` contains two parts—a slow baseband signal and a high-frequency ripple:
 
-$$\text{i\\_data} = \underbrace{\frac{1}{2}\cos(\phi(t))}_{\text{Desired Baseband}} + \underbrace{\frac{1}{2}\cos(2\omega_c t + \phi(t))}_{\text{Unwanted Ripple}}$$
+$$
+\text{i\\_data} = \underbrace{\frac{1}{2}\cos(\phi(t))}_{\text{Desired Baseband}} + \underbrace{\frac{1}{2}\cos(2\omega_c t + \phi(t))}_{\text{Unwanted Ripple}}
+$$
 
 When passed into the low-pass filter ($\text{LPF}$), coefficients $b_k$ are mathematically designed to block frequencies at or above $2\omega_c$:
 
@@ -244,16 +267,22 @@ Page 8 of  [Notes_about_Basic_Polyphase_Decimation_Filters.pdf](vx_images/Notes_
 **How does keeping 1 out of every 10 samples change the sample rate?**
 Decimation by a factor of $M = 10$ means taking a signal sampled at clock frequency $F_{s,\text{in}} = 100\text{ MHz}$ and dropping the sample frequency down to $F_{s,\text{out}}$:
 
-$$F_{s,\text{out}} = \frac{F_{s,\text{in}}}{M} = \frac{100\text{ MHz}}{10} = 10\text{ MHz}$$
+$$
+F_{s,\text{out}} = \frac{F_{s,\text{in}}}{M} = \frac{100\text{ MHz}}{10} = 10\text{ MHz}
+$$
 
 In time-domain notation, if $x[n]$ is our filtered input sequence, the decimated output sequence $y[m]$ takes every 10th sample:
 
-$$y[m] = x[m \cdot 10] \quad \text{where } m = 0, 1, 2, \dots$$
+$$
+y[m] = x[m \cdot 10] \quad \text{where } m = 0, 1, 2, \dots
+$$
 
 **Why is this safe according to Nyquist?**
 The Nyquist sampling theorem states that to prevent signal distortion (aliasing), our sampling rate must be at least twice the highest frequency component of our desired signal ($F_{\text{max}}$):
 
-$$F_{s,\text{out}} \ge 2 \cdot F_{\text{max}}$$
+$$
+F_{s,\text{out}} \ge 2 \cdot F_{\text{max}}
+$$
 
 Because our previous FIR filter already removed all frequencies above $5\text{ MHz}$, dropping the sampling rate to $10\text{ MHz}$ ($2 \times 5\text{ MHz}$) perfectly preserves all original information without losing data quality.
 
@@ -299,28 +328,42 @@ The `ddc_top.sv` file acts as the **master blueprint or system supervisor**. It 
 **How does the entire chain transform the input math into the final output?**
 Let the incoming raw signal be a passband carrier at frequency $\omega_c$:
 
-$$\text{i\\_if\\_signal}(t) = s(t) \cdot \cos(\omega_c t + \phi(t))$$
+$$
+\text{i\\_if\\_signal}(t) = s(t) \cdot \cos(\omega_c t + \phi(t))
+$$
 
 **Step 1: Quadrature Multiplication (Mixer)**
 Multiplying by internal cosine and sine waves creates two parallel pathways:
 
-$$\text{i\\_mix} = s(t)\cos(\omega_c t + \phi(t)) \cdot \cos(\omega_c t) = \frac{1}{2}s(t)\cos(\phi(t)) + \frac{1}{2}s(t)\cos(2\omega_c t + \phi(t))$$
+$$
+\text{i\\_mix} = s(t)\cos(\omega_c t + \phi(t)) \cdot \cos(\omega_c t) = \frac{1}{2}s(t)\cos(\phi(t)) + \frac{1}{2}s(t)\cos(2\omega_c t + \phi(t))
+$$
 
-$$\text{q\\_mix} = s(t)\cos(\omega_c t + \phi(t)) \cdot \sin(\omega_c t) = \frac{1}{2}s(t)\sin(2\omega_c t + \phi(t)) - \frac{1}{2}s(t)\sin(\phi(t))$$
+$$
+\text{q\\_mix} = s(t)\cos(\omega_c t + \phi(t)) \cdot \sin(\omega_c t) = \frac{1}{2}s(t)\sin(2\omega_c t + \phi(t)) - \frac{1}{2}s(t)\sin(\phi(t))
+$$
 
 **Step 2: Low-Pass Filtering (FIR Filter)**
 The LPF eliminates the high-frequency $2\omega_c$ terms completely:
 
-$$\text{i\\_fir} = \text{LPF} \left\\{ \text{i\\_mix} \right\\} = \frac{1}{2}s(t)\cos(\phi(t))$$
+$$
+\text{i\\_fir} = \text{LPF} \left\\{ \text{i\\_mix} \right\\} = \frac{1}{2}s(t)\cos(\phi(t))
+$$
 
-$$\text{q\\_fir} = \text{LPF} \left\\{ \text{q\\_mix} \right\\} = -\frac{1}{2}s(t)\sin(\phi(t))$$
+$$
+\text{q\\_fir} = \text{LPF} \left\\{ \text{q\\_mix} \right\\} = -\frac{1}{2}s(t)\sin(\phi(t))
+$$
 
 **Step 3: Downsampling (Decimator)**
 The decimator keeps 1 out of every 10 samples ($M=10$), maintaining signal accuracy while cutting down data throughput:
 
-$$\text{o\\_i\\_data}[m] = \text{i\\_fir}[10m] = \frac{1}{2}s(10m T_s)\cos(\phi(10m T_s))$$
+$$
+\text{o\\_i\\_data}[m] = \text{i\\_fir}[10m] = \frac{1}{2}s(10m T_s)\cos(\phi(10m T_s))
+$$
 
-$$\text{o\\_q\\_data}[m] = \text{q\\_fir}[10m] = -\frac{1}{2}s(10m T_s)\sin(\phi(10m T_s))$$
+$$
+\text{o\\_q\\_data}[m] = \text{q\\_fir}[10m] = -\frac{1}{2}s(10m T_s)\sin(\phi(10m T_s))
+$$
 
 
 ## 5. Expetation vs Result
@@ -384,3 +427,4 @@ The waveform trace confirms the full hardware design functions as intended:
 
 ---
 
+ 
