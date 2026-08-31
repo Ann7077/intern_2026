@@ -11,6 +11,7 @@ a(t) \cos (\omega_ct + \phi(t)) \longrightarrow a(t)e^{j\phi(t)} = a(t)\cos(\phi
 $$
 
 Our input signal is `i_if_signal` from `ddc_top_tb.sv`, which equals 
+
 $$
 \underbrace{1000\cos(2\pi\cdot 20\text{ MHz}\cdot t)}_{\text{target signal}} + \underbrace{800\cos(2\pi\cdot 35\text{ MHz}\cdot t)}_{\text{interference signal}}
 $$
@@ -33,7 +34,7 @@ The `dds.sv` file creates a clean, smooth digital sine (`dds_sin`) and cosine (`
 | --- | --- | --- | --- |
 | `clk` | Input | 1 bit | The main heartbeat clock running at $100\text{ MHz}$ |
 | `rst_n` | Input | 1 bit | The reset button (clears memory when turned off). |
-| `ftw` | Input | 32 bits | **Frequency Tuning Word:** The digital knob that sets how fast the wave oscillates. |
+| `ftw` | Input | 32 bits | **Frequency Tuning Word:** The digital step size that sets the output wave's frequency. |
 | `init_phase` | Input | 32 bits | Sets where the wave starts its cycle after a reset. |
 | `dds_sin` | Output | 12 bits | The generated sine wave output stream. |
 | `dds_cos` | Output | 12 bits | The generated cosine wave output stream. |
@@ -41,44 +42,45 @@ The `dds.sv` file creates a clean, smooth digital sine (`dds_sin`) and cosine (`
 
 ## 3. Step-by-Step From Input to Output
 
-1. **Step Forward:** On every clock tick, a 32-bit counter (`phase_acc`) takes a step forward by adding the value of `ftw`.
-2. **Find the Angle:** The top 10 bits of this counter tell us our current position (angle) on a $360^\circ$ circle.
-3. **Look Up the Value:** The module looks up that angle in a pre-stored lookup table (`lut_rom`), which holds 1024 points of a pre-calculated sine wave.
-4. **Shift for Cosine:** To make a cosine wave at the same time, the module shifts the angle forward by $90^\circ$ ($\pi/2$ radians) and reads the table again.
-5. **Send Out Data:** The numbers retrieved from the lookup table are sent out as 12-bit signed digital wave values on every clock cycle.
+1. **Phase Accumulator:** It's job is to accumulate the phase using `ftw` until wrap aroud occurs and start over.
+2. **Look-Up Table (LUT) Index Calculation:** Converts the 32-bit phase accumulator output into normalized 10-bit memory addresses for the sine lookup tables. It applies a $90^\circ$ phase shift for the cosine calculation, flips the MSB to map the phase range to the table's signed $[-1, 1)$ domain, and truncates the result to extract the top 10 address bits (`k_s` and `k_c`). 
+3. **Look-Up Table (LUT):** Here the look up table is created, the index can be used to find the corresponding sine value.
+4. **Register Output Signals:** Synchronously samples the look-up table values (`k_s` and `k_c`) on every clock edge to update the 12-bit signed output registers `dds_sin` and `dds_cos`. 
 
 
 ## 4. Mathematical Proofs: Why Numbers Are Set This Way
+### 4.1. Discrete Phase Accumulation
+Discrete sampling $t=nT_s$, where $n=0,1,2,...,\infty$
 
-**How do we set `ftw` to get a target $20\text{ MHz}$ carrier wave?**
-The 32-bit counter wraps around after $2^{32}$ steps (a full $360^\circ$ circle). To find out how big each step (`FTW`) needs to be to make a $20\text{ MHz}$ wave out of a $100\text{ MHz}$ clock, we use this ratio:
-
-$$
-\text{FTW} = \frac{\text{Target Frequency}}{\text{Clock Frequency}} \times 2^{32}
-$$
-
-Plugging in our values ($20\text{ MHz}$ target, $100\text{ MHz}$ clock):
+Sampling rate $f_s=1/T_s=100\text{ MHz}$, phase $\phi_n = n \omega_c T_s$, so
 
 $$
-\text{FTW} = \frac{20}{100} \times 4,294,967,296 = 0.2 \times 4,294,967,296 = 858,993,459
+\phi_{n+1} = (n+1)\omega_c T_s = n \omega_c T_s + \omega_c T_s = \phi_n + \phi_s
 $$
 
-Adding $858,993,459$ on every clock cycle makes the counter complete a full sine wave cycle once every 5 clock ticks ($100 / 20 = 5$).
+Since `phase_acc <= phase_acc + ftw`, `ftw` represents $\phi_s = \omega_c T_s$
 
-**Why do we add $2^{30}$ to get the Cosine wave?**
-A cosine wave is just a sine wave shifted ahead by a quarter of a full turn ($90^\circ$ out of $360^\circ$):
-
-$$
-\cos(\theta) = \sin(\theta + 90^\circ)
-$$
-
-Since a full turn ($360^\circ$) equals $2^{32}$ steps, a quarter turn ($90^\circ$) equals:
+### 4.2. Normalized Phase & Natural Overflow
+Normalize phase range from $[0,2 \pi)$ to $[0,1)$ via
 
 $$
-\frac{1}{4} \times 2^{32} = 2^{30} = \text{\texttt{1'b1 << 30}}
+\theta_n = \frac{\phi_n}{2 \pi} = n \frac{f_c}{f_s}
+$$ 
+
+Here the unsigned fixed-point arithmetic automatically handles the wrap-around, without explicit comparison like `if (phase_acc >= 2*pi_val)`.
+
+### 4.3. Normalized Frequency & FTW Derivation
+Established normalized output frequency ration and binary fixed-point representation:
+
+$$
+\frac{f_{out}}{f_{clk}} = \frac{M}{2^N} = 0.b_{N-1}b_{N-2}...b_0
 $$
 
-Adding $2^{30}$ directly to the counter gives us the exact address for the cosine wave without needing a second lookup table.
+where 
+
+$$
+FTW = M = round(\frac{f_c}{f_s} \cdot 2^N)
+$$
 
 
 ## 5. Expetation vs Result
@@ -153,8 +155,8 @@ $$
 
 ## 5. Expetation vs Result
 
-* **What to Expect:** `i_out` and `q_out` should look like fast-moving, high-frequency ripples riding along a slow, sweeping wave baseline. The fast ripple represents the double-frequency term ($2\omega_c$), while the slow sweeping shape underneath is our actual extracted baseband data.
-* **Verification Against Results:** In the simulation output, `i_out` and `q_out` show dense, fast oscillations fluctuating around a smooth sinusoidal center line, confirming the multiplication process works as intended.
+* **What to Expect:** `i_out` and `q_out` should look like fast-moving, high-frequency ripples riding along a line. The fast ripple represents the double-frequency term ($2\omega_c$), while the slow sweeping shape underneath is our actual extracted baseband data.
+* **Verification Against Results:** In the simulation output, `i_out` and `q_out` show dense, fast oscillations fluctuating around a center line, confirming the multiplication process works as intended.
 
 
 
@@ -185,7 +187,7 @@ The `fir_filter.sv` file acts as a noise cleaner. After the mixer creates baseba
 5. **Output Clean Wave:** The final 38-bit sum is sent out as `o_data` on every clock cycle.
 
 
-### MAC (Multiply-Accumulate)
+### 3.1 MAC (Multiply-Accumulate)
 The `mac_fir` module is the fundamental building block of the FIR filter. It handles the two core operations of digital filtering: signed multiplication and accumulation.
 
 #### Processing Pipeline

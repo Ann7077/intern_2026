@@ -58,8 +58,8 @@ module dds #(
     wire [PHASE_ACC_W-1:0] p_cos_offset  = {~p_cos_shifted[PHASE_ACC_W-1], p_cos_shifted[PHASE_ACC_W-2:0]};
 
     // Extract upper L bits for LUT address integer part (k_i)
-    wire [LUT_ADDR_W-1:0] k_s = p_sin_offset[PHASE_ACC_W-1 -: LUT_ADDR_W];
-    wire [LUT_ADDR_W-1:0] k_c = p_cos_offset[PHASE_ACC_W-1 -: LUT_ADDR_W];
+    wire [LUT_ADDR_W-1:0] k_s = p_sin_offset[PHASE_ACC_W-1 -: LUT_ADDR_W];  // sine, provides the Q component address
+    wire [LUT_ADDR_W-1:0] k_c = p_cos_offset[PHASE_ACC_W-1 -: LUT_ADDR_W];  // cosine, provides the I component address
     
     
     // 3. Look-Up Table 
